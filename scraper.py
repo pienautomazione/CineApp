@@ -6,17 +6,17 @@ from playwright.sync_api import sync_playwright
 OUTPUT_FILE = "movies.json"
 
 ROME_CINEMAS = [
-    {"name": "Cinema Barberini", "zone": "Centro", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5191"},
-    {"name": "Cinema Quattro Fontane", "zone": "Centro", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5195"},
-    {"name": "Cinema Adriano", "zone": "Prati", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5188"},
-    {"name": "Cinema Giulio Cesare", "zone": "Prati", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5193"},
-    {"name": "Cinema Troisi", "zone": "Trastevere", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5487"},
-    {"name": "Nuovo Sacher", "zone": "Trastevere", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5201"},
-    {"name": "Cinema Eurcine", "zone": "EUR", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5192"},
-    {"name": "Cinema Lux", "zone": "Trieste / Salario", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5194"},
-    {"name": "Cinema Odeon", "zone": "Trieste / Salario", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5196"},
-    {"name": "Cinema Greenwich", "zone": "Testaccio", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5197"},
-    {"name": "Cinema Madison", "zone": "San Paolo", "url": "https://www.webtic.it/#/shopping?action=loadLocal&localId=5198"}
+    {"name": "Cinema Barberini", "search": "Cinema Barberini", "zone": "Centro"},
+    {"name": "Cinema Quattro Fontane", "search": "Quattro Fontane", "zone": "Centro"},
+    {"name": "Cinema Adriano", "search": "Cinema Adriano", "zone": "Prati"},
+    {"name": "Cinema Giulio Cesare", "search": "Giulio Cesare", "zone": "Prati"},
+    {"name": "Cinema Troisi", "search": "Cinema Troisi", "zone": "Trastevere"},
+    {"name": "Nuovo Sacher", "search": "Nuovo Sacher", "zone": "Trastevere"},
+    {"name": "Cinema Eurcine", "search": "Eurcine", "zone": "EUR"},
+    {"name": "Cinema Lux", "search": "Cinema Lux Roma", "zone": "Trieste / Salario"},
+    {"name": "Cinema Odeon", "search": "Cinema Odeon Roma", "zone": "Trieste / Salario"},
+    {"name": "Cinema Greenwich", "search": "Greenwich", "zone": "Testaccio"},
+    {"name": "Cinema Madison", "search": "Madison Roma", "zone": "San Paolo"}
 ]
 
 GRADIENTS = [
@@ -34,10 +34,21 @@ def normalize_title(raw: str) -> str:
 def extract_from_json_payload(payload, found_list):
     """Cerca ricorsivamente dentro qualsiasi risposta JSON di Webtic titoli e orari."""
     if isinstance(payload, dict):
-        # Cerca chiavi tipiche degli eventi Webtic
-        title = payload.get("Title") or payload.get("title") or payload.get("EventName") or payload.get("Description") or ""
-        performances = payload.get("Performances") or payload.get("performances") or payload.get("Shows") or payload.get("Dates") or []
-        poster = payload.get("Poster") or payload.get("Image") or payload.get("Picture") or payload.get("ImageUrl") or ""
+        title = (
+            payload.get("Title") or payload.get("title") or
+            payload.get("EventName") or payload.get("eventName") or
+            payload.get("Description") or ""
+        )
+        performances = (
+            payload.get("Performances") or payload.get("performances") or
+            payload.get("Shows") or payload.get("shows") or
+            payload.get("Events") or payload.get("events") or []
+        )
+        poster = (
+            payload.get("Poster") or payload.get("poster") or
+            payload.get("Image") or payload.get("image") or
+            payload.get("ImageUrl") or payload.get("imageUrl") or ""
+        )
 
         if isinstance(title, str) and len(title.strip()) >= 2 and isinstance(performances, list) and len(performances) > 0:
             raw_str = json.dumps(performances)
@@ -56,7 +67,6 @@ def extract_from_json_payload(payload, found_list):
             extract_from_json_payload(item, found_list)
 
 def parse_visible_text(body_text: str) -> list:
-    """Fallback: legge le righe visibili sullo schermo cercando titoli seguiti da orari HH:MM."""
     lines = [l.strip() for l in body_text.splitlines() if l.strip()]
     results = []
     current_title = ""
@@ -72,12 +82,16 @@ def parse_visible_text(body_text: str) -> list:
                     "poster": ""
                 })
         else:
-            if 3 <= len(line) <= 75 and not re.search(r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic", line, re.I):
+            if 3 <= len(line) <= 75 and not re.search(
+                r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|cinema|teatri|musical|tutta italia",
+                line,
+                re.I
+            ):
                 current_title = line
     return results
 
 def scrape_with_browser():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio intercettazione API Webtic Roma...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio ricerca diretta su Webtic...")
     movies_dict = {}
     counter = 1
 
@@ -94,7 +108,7 @@ def scrape_with_browser():
         page = context.new_page()
 
         for cinema in ROME_CINEMAS:
-            print(f"→ Controllo {cinema['name']}...")
+            print(f"→ Ricerca {cinema['name']} su Webtic...")
             intercepted_items = []
 
             def handle_response(response):
@@ -109,18 +123,41 @@ def scrape_with_browser():
             page.on("response", handle_response)
 
             try:
-                page.goto(cinema["url"], wait_until="networkidle", timeout=25000)
-                page.wait_for_timeout(3500)
+                page.goto("https://www.webtic.it/", wait_until="domcontentloaded", timeout=25000)
+                page.wait_for_timeout(2500)
 
-                # Se l'intercettazione JSON non ha catturato nulla, usa il testo visibile renderizzato
+                # Chiude eventuale banner cookie alla prima apertura
+                for btn_text in ["Accetta", "Accetto", "Accept"]:
+                    try:
+                        btn = page.get_by_text(btn_text, exact=False).first
+                        if btn.is_visible(timeout=400):
+                            btn.click(timeout=400)
+                    except Exception:
+                        pass
+
+                # Trova la barra di ricerca visibile in homepage e digita il nome del cinema
+                search_input = page.locator("input[type='text'], input[type='search'], input[placeholder*='Cerca']").first
+                search_input.fill(cinema["search"])
+                page.wait_for_timeout(2000)
+
+                # Clicca sul primo suggerimento/risultato che contiene il nome del cinema (o premi Invio)
+                suggestion = page.locator(f"a:has-text('{cinema['search']}'), li:has-text('{cinema['search']}'), div[role='option']:has-text('{cinema['search']}')").first
+                if suggestion.is_visible(timeout=2000):
+                    suggestion.click()
+                else:
+                    search_input.press("Enter")
+
+                page.wait_for_timeout(3500)
+                current_cinema_url = page.url
+
+                # Se l'intercettazione JSON non ha catturato nulla, usa il testo visibile della pagina del cinema
                 if not intercepted_items:
                     body_text = page.inner_text("body")
                     if cinema == ROME_CINEMAS[0]:
-                        preview = " | ".join([l.strip() for l in body_text.splitlines() if l.strip()][:12])
-                        print(f"  [Anteprima pagina]: {preview}")
+                        preview = " | ".join([l.strip() for l in body_text.splitlines() if l.strip()][:15])
+                        print(f"  [Dopo click - URL: {current_cinema_url}]: {preview}")
                     intercepted_items = parse_visible_text(body_text)
 
-                # Rimuove eventuali duplicati per lo stesso cinema
                 unique_cinema_movies = {}
                 for it in intercepted_items:
                     nt = normalize_title(it["title"])
@@ -161,7 +198,7 @@ def scrape_with_browser():
                             "cinema": cinema["name"],
                             "zone": cinema["zone"],
                             "times": item["times"],
-                            "bookingUrl": cinema["url"]
+                            "bookingUrl": current_cinema_url
                         })
 
             except Exception as e:
