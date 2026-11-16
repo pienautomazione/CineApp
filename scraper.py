@@ -83,7 +83,7 @@ def parse_visible_text(body_text: str) -> list:
                 })
         else:
             if 3 <= len(line) <= 75 and not re.search(
-                r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|cinema|teatri|musical|tutta italia|nessun risultato|crea informatica",
+                r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|cinema|teatri|musical|tutta italia|nessun risultato|crea informatica|roma|lazio",
                 line,
                 re.I
             ):
@@ -91,7 +91,7 @@ def parse_visible_text(body_text: str) -> list:
     return results
 
 def scrape_with_browser():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio scansione sezione Locali su Webtic...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Apertura elenco province Webtic...")
     movies_dict = {}
     counter = 1
 
@@ -107,9 +107,9 @@ def scrape_with_browser():
         )
         page = context.new_page()
 
-        # 1. Apri la homepage e clicca su "Locali" nel menu
-        page.goto("https://www.webtic.it/app/main/home", wait_until="domcontentloaded", timeout=25000)
-        page.wait_for_timeout(2500)
+        # 1. Vai direttamente alla pagina delle province e clicca su "Roma"
+        page.goto("https://www.webtic.it/app/main/all-provinces", wait_until="domcontentloaded", timeout=25000)
+        page.wait_for_timeout(3000)
 
         for btn_text in ["Accetta", "Accetto", "Accept"]:
             try:
@@ -119,70 +119,58 @@ def scrape_with_browser():
             except Exception:
                 pass
 
+        # Clicca sulla voce "Roma" nell'elenco delle province
         try:
-            locali_link = page.get_by_text("Locali", exact=True).first
-            if locali_link.is_visible(timeout=2000):
-                locali_link.click()
-                page.wait_for_timeout(2500)
-        except Exception:
-            pass
-
-        locali_url = page.url
-        print(f"URL sezione Locali: {locali_url}")
-
-        # 2. Cerca "Roma" nella sezione Locali per raccogliere tutti i link ai cinema romani
-        cinema_links = {}
-        try:
-            search_input = page.locator("input[type='text'], input[type='search'], input").first
-            search_input.fill("Roma")
-            page.wait_for_timeout(2500)
-            search_input.press("Enter")
-            page.wait_for_timeout(2500)
-
-            # Raccoglie tutti i link visibili nella pagina dei risultati
-            anchors = page.query_selector_all("a[href]")
-            for a in anchors:
-                txt = (a.inner_text() or "").strip()
-                href = a.get_attribute("href") or ""
-                if txt and href and "/app/" in href:
-                    cinema_links[txt] = href if href.startswith("http") else f"https://www.webtic.it{href}"
-
-            print(f"Link cinema trovati per Roma ({len(cinema_links)}): {list(cinema_links.keys())[:10]}")
+            roma_el = page.get_by_text("Roma", exact=True).first
+            if roma_el.is_visible(timeout=3000):
+                roma_el.click()
+            else:
+                page.get_by_text("Roma", exact=False).first.click()
+            page.wait_for_timeout(3500)
         except Exception as e:
-            print(f"Errore ricerca Roma in Locali: {e}")
+            print(f"Errore click su provincia Roma: {e}")
 
-        # 3. Visita ciascun cinema romano trovato e legge orari + chiamate API JSON
+        rome_list_url = page.url
+        print(f"URL pagina cinema di Roma: {rome_list_url}")
+
+        # Legge i cinema elencati nella pagina di Roma
+        body_preview = " | ".join([l.strip() for l in page.inner_text("body").splitlines() if l.strip()][:20])
+        print(f"Contenuto pagina Roma: {body_preview}")
+
+        # 2. Per ogni cinema di Roma presente, clicca sul suo nome per aprire i film e gli orari
         for cinema in ROME_CINEMAS:
-            target_url = None
-            for link_text, href in cinema_links.items():
-                if cinema["keyword"].lower() in link_text.lower():
-                    target_url = href
-                    break
-
-            if not target_url:
-                continue
-
-            print(f"→ Apertura {cinema['name']} ({target_url})...")
-            intercepted_items = []
-
-            def handle_response(response):
-                try:
-                    ct = response.headers.get("content-type", "")
-                    if "json" in ct and response.status == 200:
-                        data = response.json()
-                        extract_from_json_payload(data, intercepted_items)
-                except Exception:
-                    pass
-
-            page.on("response", handle_response)
-
             try:
-                page.goto(target_url, wait_until="domcontentloaded", timeout=25000)
+                # Torna alla lista dei cinema di Roma se ci siamo spostati
+                if page.url != rome_list_url:
+                    page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
+                    page.wait_for_timeout(2500)
+
+                cinema_el = page.get_by_text(cinema["keyword"], exact=False).first
+                if not cinema_el.is_visible(timeout=1500):
+                    continue
+
+                print(f"→ Apertura {cinema['name']}...")
+                intercepted_items = []
+
+                def handle_response(response):
+                    try:
+                        ct = response.headers.get("content-type", "")
+                        if "json" in ct and response.status == 200:
+                            data = response.json()
+                            extract_from_json_payload(data, intercepted_items)
+                    except Exception:
+                        pass
+
+                page.on("response", handle_response)
+                cinema_el.click()
                 page.wait_for_timeout(3500)
+                booking_url = page.url
 
                 if not intercepted_items:
                     body_text = page.inner_text("body")
                     intercepted_items = parse_visible_text(body_text)
+
+                page.remove_listener("response", handle_response)
 
                 unique_cinema_movies = {}
                 for it in intercepted_items:
@@ -224,13 +212,11 @@ def scrape_with_browser():
                             "cinema": cinema["name"],
                             "zone": cinema["zone"],
                             "times": item["times"],
-                            "bookingUrl": target_url
+                            "bookingUrl": booking_url
                         })
 
             except Exception as e:
                 print(f"  Errore su {cinema['name']}: {e}")
-            finally:
-                page.remove_listener("response", handle_response)
 
         browser.close()
 
