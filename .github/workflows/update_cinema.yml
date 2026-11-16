@@ -23,8 +23,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Installa dipendenze
-        run: pip install -r requirements.txt
+      -       - name: Installa dipendenze
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
 
       - name: Esegui lo scraper dei cinema di Roma
         run: python scraper.py
