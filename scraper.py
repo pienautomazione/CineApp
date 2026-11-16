@@ -24,64 +24,71 @@ GRADIENTS = [
     ("from-[#2c1d42] via-[#181224] to-[#0a0a0c]", "bg-purple-500/20 text-purple-300")
 ]
 
+EXTRACT_JS = """
+() => {
+    const timeRegex = /\\b([01]?\\d|2[0-3]):[0-5]\\d\\b/g;
+    const results = [];
+    const seen = new Set();
+
+    // Cerca qualsiasi elemento con orari HH:MM nella pagina o frame
+    const allElements = document.querySelectorAll('div, li, article, section, tr, p, span, a');
+    
+    allElements.forEach(el => {
+        // Considera solo elementi foglia o piccoli blocchi che contengono orari
+        if (el.children.length > 8) return;
+        const text = (el.innerText || '').trim();
+        if (text.length < 4 || text.length > 350) return;
+
+        const matches = text.match(timeRegex);
+        if (!matches || matches.length === 0 || matches.length > 12) return;
+
+        // Risale nel DOM per trovare il titolo più vicino sopra questo blocco orari
+        let box = el.parentElement;
+        let title = '';
+        let bookingUrl = '';
+        let poster = '';
+
+        for (let i = 0; i < 5 && box; i++) {
+            const h = box.querySelector('h1, h2, h3, h4, h5, strong, b, [class*="title"], [class*="titolo"]');
+            if (h) {
+                const candidate = (h.innerText || '').trim();
+                if (candidate.length >= 2 && candidate.length <= 85 && !timeRegex.test(candidate)) {
+                    title = candidate;
+                    const a = box.querySelector('a[href*="webtic"], a[href*="bigliett"], a[href*="ticket"], a[href*="acquista"], a');
+                    if (a) bookingUrl = a.href;
+                    const img = box.querySelector('img');
+                    if (img) poster = img.src || img.getAttribute('data-src') || '';
+                    break;
+                }
+            }
+            box = box.parentElement;
+        }
+
+        if (title && !/biglietteria|contatti|dove siamo|cookie|privacy|tariff|abbonament/i.test(title)) {
+            const key = title.toLowerCase();
+            if (!seen.has(key)) {
+                seen.add(key);
+                results.push({
+                    title: title,
+                    times: [...new Set(matches)],
+                    bookingUrl: bookingUrl,
+                    poster: poster
+                });
+            }
+        }
+    });
+    return results;
+}
+"""
+
 def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"\s*[\(\[](?:V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB ITA|VM\d+)[\)\]]", "", raw, flags=re.IGNORECASE)
     return " ".join(cleaned.split()).strip().title()
 
 def scrape_with_browser():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio estrazione strutturale Roma...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio estrazione completa (pagina + iframe)...")
     movies_dict = {}
     counter = 1
-
-    # Script JavaScript eseguito dentro la pagina per trovare i blocchi con orari HH:MM
-    extract_js = """
-    () => {
-        const timeRegex = /\\b([01]?\\d|2[0-3]):[0-5]\\d\\b/g;
-        const results = [];
-        const seenTitles = new Set();
-
-        // Cerca tutti i titoli nella pagina
-        const headings = document.querySelectorAll('h1, h2, h3, h4, h5, [class*="title"], [class*="titolo"]');
-        
-        headings.forEach(h => {
-            const rawTitle = (h.innerText || '').trim();
-            if (rawTitle.length < 2 || rawTitle.length > 85) return;
-            if (/biglietteria|contatti|dove siamo|cookie|privacy|newsletter|abbonamenti|tariff/i.test(rawTitle)) return;
-
-            // Risale fino a 4 livelli nel DOM per trovare il contenitore che include gli orari di quel film
-            let container = h.parentElement;
-            let foundTimes = [];
-            let bookingLink = '';
-            let posterSrc = '';
-
-            for (let i = 0; i < 4 && container; i++) {
-                const text = container.innerText || '';
-                const matches = text.match(timeRegex);
-                // Se trova orari ma non troppi (evita di prendere l'intera pagina)
-                if (matches && matches.length > 0 && matches.length <= 15) {
-                    foundTimes = [...new Set(matches)];
-                    const a = container.querySelector('a[href*="webtic"], a[href*="bigliett"], a[href*="ticket"], a[href*="acquista"], a');
-                    if (a) bookingLink = a.href;
-                    const img = container.querySelector('img');
-                    if (img) posterSrc = img.src || img.getAttribute('data-src') || '';
-                    break;
-                }
-                container = container.parentElement;
-            }
-
-            if (foundTimes.length > 0 && !seenTitles.has(rawTitle.toLowerCase())) {
-                seenTitles.add(rawTitle.toLowerCase());
-                results.push({
-                    title: rawTitle,
-                    times: foundTimes,
-                    bookingUrl: bookingLink,
-                    poster: posterSrc
-                });
-            }
-        });
-        return results;
-    }
-    """
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -92,23 +99,37 @@ def scrape_with_browser():
         page = context.new_page()
 
         for cinema in ROME_CINEMAS:
-            print(f"→ Controllo {cinema['name']}...")
+            print(f"\n→ Controllo {cinema['name']} ({cinema['url']})...")
             try:
-                page.goto(cinema["url"], wait_until="domcontentloaded", timeout=25000)
-                page.wait_for_timeout(4000)
+                resp = page.goto(cinema["url"], wait_until="domcontentloaded", timeout=25000)
+                status = resp.status if resp else "N/A"
+                page.wait_for_timeout(4500)
 
-                # Prova a chiudere eventuali banner cookie
+                # Chiude eventuali banner cookie
                 for btn_text in ["Accetta", "Accetto", "Accept", "Chiudi"]:
                     try:
                         btn = page.get_by_text(btn_text, exact=False).first
-                        if btn.is_visible(timeout=500):
-                            btn.click(timeout=500)
+                        if btn.is_visible(timeout=400):
+                            btn.click(timeout=400)
                     except Exception:
                         pass
 
                 page.wait_for_timeout(1500)
-                extracted = page.evaluate(extract_js)
-                print(f"  Trovati {len(extracted)} film.")
+
+                # Diagnostica: mostra stato HTTP e prime parole visibili
+                body_preview = " ".join(page.inner_text("body").split())[:140]
+                print(f"  HTTP {status} | Frame totali: {len(page.frames)} | Testo: {body_preview}...")
+
+                # Estrae sia dal frame principale che da tutti gli iframe (es. Webtic)
+                extracted = []
+                for frame in page.frames:
+                    try:
+                        frame_items = frame.evaluate(EXTRACT_JS)
+                        extracted.extend(frame_items)
+                    except Exception:
+                        pass
+
+                print(f"  Film trovati: {len(extracted)}")
 
                 for item in extracted:
                     norm_title = normalize_title(item["title"])
@@ -160,9 +181,9 @@ def scrape_with_browser():
     if movies_list:
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             json.dump(movies_list, f, ensure_ascii=False, indent=2)
-        print(f"✅ Salvati {len(movies_list)} film totali in '{OUTPUT_FILE}'.")
+        print(f"\n✅ Salvati {len(movies_list)} film totali in '{OUTPUT_FILE}'.")
     else:
-        print("⚠️ Nessun dato estratto.")
+        print("\n⚠️ Nessun dato estratto.")
 
 if __name__ == "__main__":
     scrape_with_browser()
