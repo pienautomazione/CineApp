@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CineApp Roma · Biglietteria & Orari</title>
+  <title>CineApp · Biglietteria & Orari</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background-color: #0a0a0c; color: #f4f4f6; -webkit-tap-highlight-color: transparent; }
@@ -13,32 +13,67 @@
 </head>
 <body class="min-h-screen pb-24 font-sans antialiased">
 
-  <!-- Header -->
-  <header class="sticky top-0 z-30 bg-[#0a0a0c]/90 backdrop-blur-md border-b border-white/10 px-4 pt-4 pb-3">
+  <!-- Header & Ricerca a 3 campi -->
+  <header class="sticky top-0 z-30 bg-[#0a0a0c]/95 backdrop-blur-md border-b border-white/10 px-4 pt-4 pb-3.5">
     <div class="max-w-3xl mx-auto">
       <div class="flex items-center justify-between mb-3">
         <div>
-          <span class="text-[11px] font-semibold uppercase tracking-widest text-amber-400">Roma · In Sala Oggi</span>
+          <span class="text-[11px] font-semibold uppercase tracking-widest text-amber-400">Biglietteria Ufficiale</span>
           <h1 class="text-2xl font-bold tracking-tight text-white">CineApp</h1>
         </div>
-        <span id="movieCount" class="text-xs bg-white/10 text-zinc-300 px-2.5 py-1 rounded-full">Caricamento...</span>
+        <div class="flex items-center gap-2">
+          <button id="resetFiltersBtn" onclick="resetAllFilters()" class="hidden text-xs text-amber-400 hover:underline px-2 py-1">
+            Azzera filtri
+          </button>
+          <span id="movieCount" class="text-xs bg-white/10 text-zinc-300 px-2.5 py-1 rounded-full">Caricamento...</span>
+        </div>
       </div>
 
-      <!-- Barra di ricerca -->
-      <div class="relative mb-3">
+      <!-- 1. Campo Titolo con suggerimenti di completamento -->
+      <div class="relative mb-2.5">
         <input
-          id="searchInput"
+          id="titleInput"
           type="text"
-          placeholder="Cerca film, cinema (es. Adriano, Troisi) o zona..."
-          class="w-full bg-white/10 text-white placeholder-zinc-400 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
+          autocomplete="off"
+          placeholder="Cerca titolo del film..."
+          class="w-full bg-white/10 text-white placeholder-zinc-400 text-sm rounded-xl pl-10 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
         />
         <svg class="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
         </svg>
+        <button id="clearTitleBtn" onclick="clearTitle()" class="hidden absolute right-3 top-2.5 text-zinc-400 hover:text-white text-sm">✕</button>
+
+        <!-- Tendina suggerimenti autocompletamento -->
+        <div id="titleSuggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#18181f] border border-white/15 rounded-xl shadow-2xl overflow-hidden z-40 max-h-56 overflow-y-auto"></div>
       </div>
 
-      <!-- Filtri Zona -->
-      <div id="zoneFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+      <!-- 2. Campo Città + 3. Campo Cinema (dipendente dalla Città) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- Campo Città con menu a tendina -->
+        <div class="relative">
+          <select
+            id="citySelect"
+            onchange="onCityChange()"
+            class="w-full appearance-none bg-white/10 text-white text-sm rounded-xl px-3.5 py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-amber-400/60 cursor-pointer"
+          >
+            <option value="" class="bg-[#141418] text-zinc-300">1. Seleziona Città...</option>
+          </select>
+          <span class="pointer-events-none absolute right-3 top-3 text-zinc-400 text-xs">▼</span>
+        </div>
+
+        <!-- Campo Cinema con menu a tendina (attivo solo dopo aver scelto la Città) -->
+        <div class="relative">
+          <select
+            id="cinemaSelect"
+            disabled
+            onchange="renderMovies()"
+            class="w-full appearance-none bg-white/10 text-white text-sm rounded-xl px-3.5 py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-amber-400/60 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <option value="" class="bg-[#141418] text-zinc-400">2. Prima scegli una città</option>
+          </select>
+          <span class="pointer-events-none absolute right-3 top-3 text-zinc-400 text-xs">▼</span>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -52,7 +87,7 @@
     <div class="bg-[#141418] border border-white/10 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88vh] overflow-y-auto p-5 shadow-2xl">
       <div class="flex justify-between items-start gap-3 mb-3">
         <div>
-          <span id="modalTag" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">ROMA</span>
+          <span id="modalTag" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">IN SALA</span>
           <h2 id="modalTitle" class="text-xl font-bold text-white mt-1"></h2>
           <p id="modalMeta" class="text-xs text-zinc-400 mt-0.5"></p>
         </div>
@@ -68,86 +103,164 @@
 
   <script>
     let allMovies = [];
-    let selectedZone = "Tutte";
 
     async function loadMovies() {
       try {
-        // Parametro timestamp per evitare che Safari mostri vecchi file in cache
         const res = await fetch(`./movies.json?t=${Date.now()}`);
         if (!res.ok) throw new Error("Errore caricamento movies.json");
         allMovies = await res.json();
-        renderZoneFilters();
+        populateCities();
         renderMovies();
       } catch (err) {
         document.getElementById("moviesGrid").innerHTML = `
           <div class="col-span-full text-center py-12 text-zinc-400 text-sm">
-            Impossibile caricare i palinsesti al momento. Riprova tra qualche secondo.
+            Impossibile caricare i palinsesti al momento.
           </div>`;
       }
     }
 
-    function renderZoneFilters() {
-      const zones = new Set(["Tutte"]);
-      allMovies.forEach(m => (m.screenings || []).forEach(s => { if (s.zone) zones.add(s.zone); }));
+    function populateCities() {
+      const cities = new Set();
+      allMovies.forEach(m => (m.screenings || []).forEach(s => {
+        if (s.city) cities.add(s.city.trim());
+      }));
 
-      const container = document.getElementById("zoneFilters");
-      container.innerHTML = Array.from(zones).map(zone => `
-        <button
-          onclick="setZone('${zone.replace(/'/g, "\\'")}')"
-          class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
-            selectedZone === zone
-              ? "bg-amber-400 text-black font-semibold"
-              : "bg-white/10 text-zinc-300 hover:bg-white/15"
-          }">
-          ${zone}
-        </button>
-      `).join("");
+      const citySelect = document.getElementById("citySelect");
+      const sortedCities = Array.from(cities).sort();
+      citySelect.innerHTML = `<option value="" class="bg-[#141418]">1. Tutte le città (${sortedCities.length})</option>` +
+        sortedCities.map(c => `<option value="${c}" class="bg-[#141418]">${c}</option>`).join("");
     }
 
-    function setZone(zone) {
-      selectedZone = zone;
-      renderZoneFilters();
+    function onCityChange() {
+      const selectedCity = document.getElementById("citySelect").value;
+      const cinemaSelect = document.getElementById("cinemaSelect");
+
+      if (!selectedCity) {
+        cinemaSelect.disabled = true;
+        cinemaSelect.innerHTML = `<option value="" class="bg-[#141418]">2. Prima scegli una città</option>`;
+        renderMovies();
+        return;
+      }
+
+      // Popola il menu a tendina Cinema solo con le sale della città selezionata
+      const cinemas = new Set();
+      allMovies.forEach(m => (m.screenings || []).forEach(s => {
+        if ((s.city || "").trim() === selectedCity && s.cinema) {
+          cinemas.add(s.cinema.trim());
+        }
+      }));
+
+      const sortedCinemas = Array.from(cinemas).sort();
+      cinemaSelect.disabled = false;
+      cinemaSelect.innerHTML = `<option value="" class="bg-[#141418]">Tutti i cinema di ${selectedCity} (${sortedCinemas.length})</option>` +
+        sortedCinemas.map(c => `<option value="${c}" class="bg-[#141418]">${c}</option>`).join("");
+
       renderMovies();
     }
 
+    function updateTitleSuggestions() {
+      const input = document.getElementById("titleInput");
+      const box = document.getElementById("titleSuggestions");
+      const clearBtn = document.getElementById("clearTitleBtn");
+      const q = input.value.trim().toLowerCase();
+
+      clearBtn.classList.toggle("hidden", !q);
+
+      if (!q) {
+        box.classList.add("hidden");
+        box.innerHTML = "";
+        return;
+      }
+
+      const matches = allMovies
+        .filter(m => m.title.toLowerCase().includes(q))
+        .slice(0, 8);
+
+      if (!matches.length) {
+        box.classList.add("hidden");
+        return;
+      }
+
+      box.innerHTML = matches.map(m => `
+        <button
+          type="button"
+          onclick="selectSuggestion('${m.title.replace(/'/g, "\\'")}')"
+          class="w-full text-left px-3.5 py-2.5 text-sm text-zinc-200 hover:bg-amber-400/20 hover:text-amber-300 border-b border-white/5 last:border-none flex justify-between items-center"
+        >
+          <span class="truncate font-medium">${m.title}</span>
+          <span class="text-[11px] text-zinc-400 ml-2 shrink-0">${(m.screenings || []).length} sale</span>
+        </button>
+      `).join("");
+      box.classList.remove("hidden");
+    }
+
+    function selectSuggestion(title) {
+      document.getElementById("titleInput").value = title;
+      document.getElementById("titleSuggestions").classList.add("hidden");
+      renderMovies();
+    }
+
+    function clearTitle() {
+      document.getElementById("titleInput").value = "";
+      document.getElementById("clearTitleBtn").classList.add("hidden");
+      document.getElementById("titleSuggestions").classList.add("hidden");
+      renderMovies();
+    }
+
+    function resetAllFilters() {
+      document.getElementById("titleInput").value = "";
+      document.getElementById("clearTitleBtn").classList.add("hidden");
+      document.getElementById("titleSuggestions").classList.add("hidden");
+      document.getElementById("citySelect").value = "";
+      onCityChange();
+    }
+
     function renderMovies() {
-      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      const titleQuery = document.getElementById("titleInput").value.toLowerCase().trim();
+      const selectedCity = document.getElementById("citySelect").value;
+      const selectedCinema = document.getElementById("cinemaSelect").value;
+
+      const hasFilters = Boolean(titleQuery || selectedCity || selectedCinema);
+      document.getElementById("resetFiltersBtn").classList.toggle("hidden", !hasFilters);
+
       const filtered = allMovies.filter(movie => {
         const screenings = movie.screenings || [];
-        const matchesZone = selectedZone === "Tutte" || screenings.some(s => s.zone === selectedZone);
-        const matchesQuery = !q ||
-          movie.title.toLowerCase().includes(q) ||
-          screenings.some(s => s.cinema.toLowerCase().includes(q) || (s.zone || "").toLowerCase().includes(q));
-        return matchesZone && matchesQuery;
+        const matchesTitle = !titleQuery || movie.title.toLowerCase().includes(titleQuery);
+        const matchesCity = !selectedCity || screenings.some(s => (s.city || "").trim() === selectedCity);
+        const matchesCinema = !selectedCinema || screenings.some(s => (s.cinema || "").trim() === selectedCinema);
+        return matchesTitle && matchesCity && matchesCinema;
       });
 
       document.getElementById("movieCount").textContent = `${filtered.length} film`;
       const grid = document.getElementById("moviesGrid");
 
       if (!filtered.length) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-400 text-sm">Nessun film trovato per i filtri selezionati.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-400 text-sm">Nessun film trovato con i filtri impostati.</div>`;
         return;
       }
 
       grid.innerHTML = filtered.map(movie => {
-        const screenings = selectedZone === "Tutte"
-          ? (movie.screenings || [])
-          : (movie.screenings || []).filter(s => s.zone === selectedZone);
+        let screenings = movie.screenings || [];
+        if (selectedCity) screenings = screenings.filter(s => (s.city || "").trim() === selectedCity);
+        if (selectedCinema) screenings = screenings.filter(s => (s.cinema || "").trim() === selectedCinema);
 
         const posterHtml = movie.posterUrl
-          ? `<img src="${movie.posterUrl}" alt="${movie.title}" class="w-full h-48 object-cover" loading="lazy" onerror="this.style.display='none'" />`
-          : `<div class="w-full h-36 bg-gradient-to-br ${movie.gradient || 'from-zinc-800 to-zinc-950'} flex items-end p-4">
-               <span class="text-xs uppercase tracking-widest text-white/50 font-semibold">Roma · Biglietteria Ufficiale</span>
+          ? `<div class="relative w-full h-56 bg-zinc-900 overflow-hidden">
+               <img src="${movie.posterUrl}" alt="${movie.title}" class="w-full h-full object-cover" loading="lazy"
+                    onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br ${movie.gradient || 'from-zinc-800 to-zinc-950'} flex items-end p-4\\'><span class=\\'text-xs uppercase tracking-widest text-white/50 font-semibold\\'>In Programmazione</span></div>'" />
+             </div>`
+          : `<div class="w-full h-40 bg-gradient-to-br ${movie.gradient || 'from-zinc-800 to-zinc-950'} flex items-end p-4">
+               <span class="text-xs uppercase tracking-widest text-white/50 font-semibold">Biglietteria Ufficiale</span>
              </div>`;
 
         const cinemasPreview = screenings.slice(0, 2).map(s => `
-          <div class="mt-2 pt-2 border-t border-white/10">
+          <div class="mt-2.5 pt-2.5 border-t border-white/10">
             <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-zinc-200">${s.cinema}</span>
-              <span class="text-zinc-400">${s.zone}</span>
+              <span class="font-semibold text-zinc-200 truncate pr-2">${s.cinema}</span>
+              <span class="text-zinc-400 shrink-0">${s.zone || s.city}</span>
             </div>
             <div class="flex flex-wrap gap-1.5 mt-1.5">
-              ${s.times.slice(0, 5).map(t => `
+              ${s.times.slice(0, 6).map(t => `
                 <a href="${s.bookingUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
                    class="px-2 py-0.5 rounded bg-amber-400/15 text-amber-300 border border-amber-400/30 text-xs font-medium hover:bg-amber-400 hover:text-black transition">
                   ${t}
@@ -158,15 +271,17 @@
         `).join("");
 
         return `
-          <article onclick="openModal(${movie.id})" class="bg-[#141418] border border-white/10 rounded-2xl overflow-hidden shadow-lg active:scale-[0.99] transition cursor-pointer">
+          <article onclick="openModal(${movie.id})" class="bg-[#141418] border border-white/10 rounded-2xl overflow-hidden shadow-lg active:scale-[0.99] transition cursor-pointer flex flex-col">
             ${posterHtml}
-            <div class="p-4">
-              <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${movie.accent || 'bg-amber-500/20 text-amber-300'}">${movie.tag || 'ROMA'}</span>
-                <span class="text-xs text-zinc-400">${screenings.length} ${screenings.length === 1 ? 'sala' : 'sale'}</span>
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${movie.accent || 'bg-amber-500/20 text-amber-300'}">${movie.tag || 'ROMA'}</span>
+                  <span class="text-xs text-zinc-400">${screenings.length} ${screenings.length === 1 ? 'sala' : 'sale'}</span>
+                </div>
+                <h2 class="text-lg font-bold text-white leading-snug">${movie.title}</h2>
               </div>
-              <h2 class="text-lg font-bold text-white leading-snug">${movie.title}</h2>
-              ${cinemasPreview}
+              <div>${cinemasPreview}</div>
             </div>
           </article>
         `;
@@ -177,16 +292,22 @@
       const movie = allMovies.find(m => m.id === id);
       if (!movie) return;
 
+      const selectedCity = document.getElementById("citySelect").value;
+      const selectedCinema = document.getElementById("cinemaSelect").value;
+      let screenings = movie.screenings || [];
+      if (selectedCity) screenings = screenings.filter(s => (s.city || "").trim() === selectedCity);
+      if (selectedCinema) screenings = screenings.filter(s => (s.cinema || "").trim() === selectedCinema);
+
       document.getElementById("modalTitle").textContent = movie.title;
       document.getElementById("modalMeta").textContent = `${movie.genre || 'In Sala'} · ${movie.duration || 'Oggi'}`;
       document.getElementById("modalSynopsis").textContent = movie.synopsis || "";
 
       const list = document.getElementById("modalScreenings");
-      list.innerHTML = (movie.screenings || []).map(s => `
+      list.innerHTML = screenings.map(s => `
         <div class="bg-white/5 border border-white/10 rounded-xl p-3">
           <div class="flex justify-between items-center mb-2">
             <span class="font-semibold text-sm text-white">${s.cinema}</span>
-            <span class="text-xs text-zinc-400">${s.zone}</span>
+            <span class="text-xs text-zinc-400">${s.zone || s.city}</span>
           </div>
           <div class="flex flex-wrap gap-2">
             ${s.times.map(t => `
@@ -206,7 +327,18 @@
       document.getElementById("movieModal").classList.add("hidden");
     }
 
-    document.getElementById("searchInput").addEventListener("input", renderMovies);
+    document.getElementById("titleInput").addEventListener("input", () => {
+      updateTitleSuggestions();
+      renderMovies();
+    });
+
+    // Chiude la tendina suggerimenti se si tocca fuori
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#titleInput") && !e.target.closest("#titleSuggestions")) {
+        document.getElementById("titleSuggestions").classList.add("hidden");
+      }
+    });
+
     loadMovies();
   </script>
 </body>
