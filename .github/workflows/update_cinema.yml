@@ -2,9 +2,7 @@ name: Aggiorna Cinema Roma (03:00 e 15:00)
 
 on:
   schedule:
-    # Gira alle 02:00 UTC (03:00 IT) e alle 14:00 UTC (15:00 IT)
     - cron: '0 2,14 * * *'
-  # Permette di avviare l'aggiornamento manualmente con un clic
   workflow_dispatch:
 
 permissions:
@@ -23,11 +21,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      -       - name: Installa dipendenze
+      - name: Installa dipendenze
         run: |
           pip install -r requirements.txt
           playwright install chromium
-
 
       - name: Esegui lo scraper dei cinema di Roma
         run: python scraper.py
