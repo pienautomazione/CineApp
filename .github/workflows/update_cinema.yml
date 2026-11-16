@@ -1,0 +1,37 @@
+name: Aggiorna Cinema Roma (03:00 e 15:00)
+
+on:
+  schedule:
+    # Gira alle 02:00 UTC (03:00 IT) e alle 14:00 UTC (15:00 IT)
+    - cron: '0 2,14 * * *'
+  # Permette di avviare l'aggiornamento manualmente con un clic
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica i file del repository
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installa dipendenze
+        run: pip install -r requirements.txt
+
+      - name: Esegui lo scraper dei cinema di Roma
+        run: python scraper.py
+
+      - name: Salva e pubblica il nuovo movies.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Cinema Bot"
+          git add movies.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Aggiornamento palinsesti Roma" && git push)
