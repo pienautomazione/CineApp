@@ -1,40 +1,22 @@
 import json
 import re
 from datetime import datetime
-from urllib.parse import urljoin
+import requests
 from playwright.sync_api import sync_playwright
 
 OUTPUT_FILE = "movies.json"
 
 ROME_ZONES = {
-    "barberini": "Centro",
-    "quattro fontane": "Centro",
-    "farnese": "Campo de' Fiori",
-    "fiamma": "Centro",
-    "troisi": "Trastevere",
-    "nuovo sacher": "Trastevere",
-    "sacher": "Trastevere",
-    "intrastevere": "Trastevere",
-    "adriano": "Prati",
-    "eden": "Prati",
-    "giulio cesare": "Prati",
-    "azzurro scipioni": "Prati",
-    "lux": "Trieste / Salario",
-    "odeon": "Trieste / Salario",
-    "savoy": "Salario",
-    "mignon": "Salario",
-    "greenwich": "Testaccio",
-    "eurcine": "EUR",
-    "atlantic": "Tuscolana",
-    "madison": "San Paolo",
-    "antares": "Monte Sacro",
-    "broadway": "Prenestina",
-    "tibur": "San Lorenzo",
-    "andromeda": "Termini",
-    "caravaggio": "Parioli",
-    "maestoso": "Appia",
-    "reale": "Trastevere",
-    "alhambra": "Prati"
+    "barberini": "Centro", "quattro fontane": "Centro", "farnese": "Campo de' Fiori",
+    "fiamma": "Centro", "troisi": "Trastevere", "sacher": "Trastevere",
+    "intrastevere": "Trastevere", "reale": "Trastevere", "adriano": "Prati",
+    "eden": "Prati", "giulio cesare": "Prati", "azzurro scipioni": "Prati",
+    "lux": "Trieste / Salario", "odeon": "Trieste / Salario", "savoy": "Salario",
+    "mignon": "Salario", "greenwich": "Testaccio", "eurcine": "EUR",
+    "atlantic": "Tuscolana", "madison": "San Paolo", "antares": "Monte Sacro",
+    "broadway": "Prenestina", "tibur": "San Lorenzo", "andromeda": "Termini",
+    "caravaggio": "Parioli", "maestoso": "Appia", "parco de' medici": "Magliana",
+    "moderno": "Repubblica", "porta di roma": "Bufalotta", "roma est": "Lunghezza"
 }
 
 GRADIENTS = [
@@ -45,121 +27,139 @@ GRADIENTS = [
     ("from-[#2c1d42] via-[#181224] to-[#0a0a0c]", "bg-purple-500/20 text-purple-300")
 ]
 
-# Estrae direttamente dal DOM della scheda cinema: Titolo + Locandina reale + Orari
-EXTRACT_MOVIES_DOM_JS = """
-() => {
-    const timeRegex = /\\b([01]?\\d|2[0-3]):[0-5]\\d\\b/g;
-    const results = [];
-    const seen = new Set();
+POSTER_CACHE = {}
 
-    // Cerca tutti i contenitori che hanno un'immagine locandina o un titolo e degli orari
-    const cards = document.querySelectorAll('article, [class*="event"], [class*="movie"], [class*="film"], [class*="card"], [class*="item"], li, div');
-
-    cards.forEach(card => {
-        if (card.children.length > 15) return;
-        const text = (card.innerText || '').trim();
-        if (text.length < 10 || text.length > 800) return;
-
-        const matches = text.match(timeRegex);
-        if (!matches || matches.length === 0 || matches.length > 18) return;
-
-        // Cerca il titolo principale del film
-        const titleEl = card.querySelector('h1, h2, h3, h4, h5, [class*="title"], [class*="titolo"], [class*="name"], strong, b');
-        if (!titleEl) return;
-
-        const rawTitle = (titleEl.innerText || '').trim();
-        if (rawTitle.length < 2 || rawTitle.length > 80 || timeRegex.test(rawTitle)) return;
-        if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio|via |viale |piazza |tel\\.|sala \\d/i.test(rawTitle)) return;
-
-        // Cerca la locandina reale associata a questo film (risalendo al massimo di 2 livelli se serve)
-        let poster = '';
-        let searchBox = card;
-        for (let i = 0; i < 3 && searchBox; i++) {
-            const imgs = searchBox.querySelectorAll('img');
-            for (const img of imgs) {
-                const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
-                if (src && src.startsWith('http') && !/logo|icon|avatar|flag|banner|placeholder/i.test(src)) {
-                    poster = src;
-                    break;
-                }
-            }
-            if (poster) break;
-            searchBox = searchBox.parentElement;
-        }
-
-        const key = rawTitle.toLowerCase();
-        if (!seen.has(key)) {
-            seen.add(key);
-            results.push({
-                title: rawTitle,
-                times: [...new Set(matches)],
-                poster: poster
-            });
-        }
-    });
-
-    return results;
-}
-"""
+def fetch_hd_poster(title: str) -> str:
+    """Recupera la locandina HD ufficiale tramite iTunes Search API (gratuita, no API key)."""
+    if title in POSTER_CACHE:
+        return POSTER_CACHE[title]
+    try:
+        r = requests.get(
+            "https://itunes.apple.com/search",
+            params={"term": title, "media": "movie", "country": "it", "limit": 1},
+            timeout=6
+        )
+        if r.status_code == 200:
+            results = r.json().get("results", [])
+            if results:
+                art = results[0].get("artworkUrl100", "")
+                if art:
+                    hd_art = art.replace("100x100bb", "600x600bb")
+                    POSTER_CACHE[title] = hd_art
+                    return hd_art
+    except Exception:
+        pass
+    POSTER_CACHE[title] = ""
+    return ""
 
 def detect_zone(cinema_name: str) -> str:
-    lower_name = cinema_name.lower()
-    for key, zone in ROME_ZONES.items():
-        if key in lower_name:
-            return zone
+    lower = cinema_name.lower()
+    for k, z in ROME_ZONES.items():
+        if k in lower:
+            return z
     return "Roma"
 
-def clean_cinema_name(raw_name: str) -> str:
-    # Ripulisce eventuali righe extra (es. indirizzo o "Roma") dal nome del cinema
-    first_line = raw_name.splitlines()[0].strip()
-    cleaned = re.sub(r"\s*[-–|]\s*Roma$", "", first_line, flags=re.IGNORECASE).strip()
-    return cleaned or first_line
-
 def normalize_title(raw: str) -> str:
-    cleaned = re.sub(r"\s*[\(\[](?:V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB ITA|VM\d+)[\)\]]", "", raw, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*[\(\[](?:V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB ITA|VM\d+|EVENTO)[\)\]]", "", raw, flags=re.IGNORECASE)
     return " ".join(cleaned.split()).strip().title()
 
-def parse_visible_text_fallback(body_text: str) -> list:
-    lines = [l.strip() for l in body_text.splitlines() if l.strip()]
-    results = []
-    current_title = ""
-    current_times = []
-    time_re = re.compile(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b")
-    ignore_re = re.compile(
-        r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|cinema|teatri|musical|tutta italia|crea informatica|provincia|roma|lazio|via |viale |piazza |tel\.|info@|scheda|dettagli|sala \d",
-        re.I
-    )
+def extract_today_from_webtic_dom(page) -> list:
+    """Estrae solo i film e gli orari del primo blocco giornaliero (Oggi) dalla scheda Webtic."""
+    return page.evaluate("""
+    () => {
+        const results = [];
+        const timeRegex = /^([01]?\\d|2[0-3]):[0-5]\\d$/;
+        
+        // Cerca i blocchi film strutturati su Webtic
+        const movieBlocks = document.querySelectorAll('[class*="event"], [class*="movie"], [class*="film"], article, .card');
+        const seen = new Set();
 
-    for line in lines:
-        times = time_re.findall(line)
-        if times:
-            if current_title:
-                current_times.extend(times)
-        else:
-            if current_title and current_times:
-                results.append({
-                    "title": current_title,
-                    "times": list(dict.fromkeys(current_times)),
-                    "poster": ""
-                })
-                current_title = ""
-                current_times = []
+        movieBlocks.forEach(block => {
+            if (block.children.length > 18) return;
+            const titleEl = block.querySelector('h1, h2, h3, h4, [class*="title"], [class*="titolo"]');
+            if (!titleEl) return;
 
-            if 3 <= len(line) <= 70 and not ignore_re.search(line) and not line.isdigit():
-                current_title = line
+            const title = (titleEl.innerText || '').trim();
+            if (title.length < 2 || title.length > 75 || seen.has(title.toLowerCase())) return;
+            if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio/i.test(title)) return;
 
-    if current_title and current_times:
-        results.append({
-            "title": current_title,
-            "times": list(dict.fromkeys(current_times)),
-            "poster": ""
-        })
-    return results
+            // Estrae SOLO i bottoni/badge che contengono un orario esatto HH:MM (ignora testi descrittivi o durate)
+            const timeElements = block.querySelectorAll('button, a, span, div');
+            const times = [];
+            timeElements.forEach(el => {
+                if (el.children.length === 0) {
+                    const txt = (el.innerText || '').trim();
+                    if (timeRegex.test(txt)) {
+                        times.push(txt);
+                    }
+                }
+            });
 
-def scrape_all_rome_cinemas():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Scansione COMPLETA sale di Roma su Webtic...")
+            if (times.length === 0) return;
+
+            // Cerca locandina
+            let poster = '';
+            const img = block.querySelector('img') || (block.parentElement && block.parentElement.querySelector('img'));
+            if (img) {
+                const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
+                if (src.startsWith('http') && !/logo|icon|flag|placeholder/i.test(src)) {
+                    poster = src;
+                }
+            }
+
+            seen.add(title.toLowerCase());
+            results.push({
+                title: title,
+                times: [...new Set(times)].sort(),
+                poster: poster
+            });
+        });
+
+        return results;
+    }
+    """)
+
+def scrape_all_rome():
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta completa Roma (Webtic + Circuito Cinema)...")
     movies_dict = {}
     counter = 1
+
+    def add_screening(raw_title: str, cinema_name: str, city: str, times: list, booking_url: str, poster: str = ""):
+        nonlocal counter
+        norm_title = normalize_title(raw_title)
+        if not norm_title or len(norm_title) < 2 or not times:
+            return
+
+        if not poster:
+            poster = fetch_hd_poster(norm_title)
+
+        if norm_title not in movies_dict:
+            grad, acc = GRADIENTS[(counter - 1) % len(GRADIENTS)]
+            movies_dict[norm_title] = {
+                "id": counter,
+                "title": norm_title,
+                "genre": "In Sala",
+                "duration": "Programmazione odierna",
+                "rating": "★",
+                "posterUrl": poster,
+                "gradient": grad,
+                "accent": acc,
+                "tag": city.upper(),
+                "synopsis": "Proiezione ufficiale in sala. Seleziona un orario per accedere direttamente alla biglietteria del cinema.",
+                "screenings": []
+            }
+            counter += 1
+        elif not movies_dict[norm_title]["posterUrl"] and poster:
+            movies_dict[norm_title]["posterUrl"] = poster
+
+        if not any(s["cinema"] == cinema_name for s in movies_dict[norm_title]["screenings"]):
+            movies_dict[norm_title]["screenings"].append({
+                "city": city,
+                "cinema": cinema_name,
+                "zone": detect_zone(cinema_name),
+                "times": sorted(list(dict.fromkeys(times))),
+                "bookingUrl": booking_url
+            })
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -173,6 +173,7 @@ def scrape_all_rome_cinemas():
         )
         page = context.new_page()
 
+        # 1. Raccoglie tutte le sale su Webtic Roma (all-locals/RM)
         rome_list_url = "https://www.webtic.it/app/main/all-locals/RM"
         page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
         page.wait_for_timeout(3000)
@@ -185,12 +186,10 @@ def scrape_all_rome_cinemas():
             except Exception:
                 pass
 
-        # Scorre verso il basso per caricare tutti i cinema (incluso Circuito Cinema)
-        for _ in range(5):
+        for _ in range(6):
             page.mouse.wheel(0, 1500)
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(400)
 
-        # Raccoglie TUTTI i link ai locali presenti nella pagina di Roma
         raw_links = page.evaluate("""
         () => {
             const items = [];
@@ -198,11 +197,10 @@ def scrape_all_rome_cinemas():
             document.querySelectorAll('a[href]').forEach(a => {
                 const href = a.href || '';
                 const text = (a.innerText || '').trim();
-                // Esclude i link di navigazione generica
                 if (href.includes('/app/') && !href.includes('/all-locals') && !href.includes('/all-provinces') && !href.includes('/home') && !href.includes('/events')) {
                     if (text.length >= 3 && !seenUrls.has(href)) {
                         seenUrls.add(href);
-                        items.push({ name: text, url: href });
+                        items.push({ name: text.splitlines()[0].trim(), url: href });
                     }
                 }
             });
@@ -210,70 +208,51 @@ def scrape_all_rome_cinemas():
         }
         """)
 
-        # Filtra fuori eventuali cinema fuori comune di Roma (es. Santa Marinella, Civitavecchia, ecc.)
         excluded_towns = ["santa marinella", "civitavecchia", "velletri", "tivoli", "frascati", "albano", "anzio", "nettuno", "pomezia", "guidonia", "colleferro", "bracciano", "fiumicino"]
-        cinema_list = []
-        for item in raw_links:
-            c_name = clean_cinema_name(item["name"])
-            if any(town in c_name.lower() for town in excluded_towns):
-                continue
-            cinema_list.append({"name": c_name, "url": item["url"]})
+        cinema_list = [
+            {"name": re.sub(r"\s*[-–|]\s*Roma$", "", item["name"], flags=re.I).strip(), "url": item["url"]}
+            for item in raw_links
+            if not any(t in item["name"].lower() for t in excluded_towns)
+        ]
 
-        print(f"Trovate {len(cinema_list)} sale a Roma: {[c['name'] for c in cinema_list]}")
+        print(f"Trovate {len(cinema_list)} sale su Webtic Roma.")
 
         for cinema in cinema_list:
-            print(f"→ Apertura {cinema['name']}...")
             try:
                 page.goto(cinema["url"], wait_until="domcontentloaded", timeout=20000)
-                page.wait_for_timeout(3000)
-
-                extracted = page.evaluate(EXTRACT_MOVIES_DOM_JS)
-                if not extracted:
-                    extracted = parse_visible_text_fallback(page.inner_text("body"))
-
-                print(f"  Estratti {len(extracted)} film (con locandine: {sum(1 for x in extracted if x.get('poster'))}).")
-
-                zone = detect_zone(cinema["name"])
-
-                for item in extracted:
-                    norm_title = normalize_title(item["title"])
-                    if not norm_title or len(norm_title) < 2:
-                        continue
-
-                    poster = item.get("poster", "")
-                    if poster and poster.startswith("/"):
-                        poster = urljoin(cinema["url"], poster)
-
-                    if norm_title not in movies_dict:
-                        grad, acc = GRADIENTS[(counter - 1) % len(GRADIENTS)]
-                        movies_dict[norm_title] = {
-                            "id": counter,
-                            "title": norm_title,
-                            "genre": "In Sala · Roma",
-                            "duration": "Programmazione odierna",
-                            "rating": "★",
-                            "posterUrl": poster if poster.startswith("http") else "",
-                            "gradient": grad,
-                            "accent": acc,
-                            "tag": "ROMA",
-                            "synopsis": "Biglietteria ufficiale Webtic. Tocca un orario per scegliere il posto in sala e acquistare.",
-                            "screenings": []
-                        }
-                        counter += 1
-                    elif not movies_dict[norm_title]["posterUrl"] and poster.startswith("http"):
-                        movies_dict[norm_title]["posterUrl"] = poster
-
-                    if not any(s["cinema"] == cinema["name"] for s in movies_dict[norm_title]["screenings"]):
-                        movies_dict[norm_title]["screenings"].append({
-                            "city": "Roma",
-                            "cinema": cinema["name"],
-                            "zone": zone,
-                            "times": item["times"],
-                            "bookingUrl": cinema["url"]
-                        })
-
+                page.wait_for_timeout(2800)
+                items = extract_today_from_webtic_dom(page)
+                print(f"→ {cinema['name']}: {len(items)} film")
+                for it in items:
+                    add_screening(it["title"], cinema["name"], "Roma", it["times"], cinema["url"], it["poster"])
             except Exception as e:
                 print(f"  Errore su {cinema['name']}: {e}")
+
+        # 2. Integra Circuito Cinema Roma (Barberini, Quattro Fontane, Adriano, Giulio Cesare, Eurcine, Lux, Odeon, Fiamma, Mignon, Savoy)
+        circuito_cinemas = [
+            {"name": "Cinema Barberini", "url": "https://www.circuitocinema.com/cinema/barberini/"},
+            {"name": "Cinema Quattro Fontane", "url": "https://www.circuitocinema.com/cinema/quattro-fontane/"},
+            {"name": "Cinema Adriano", "url": "https://www.circuitocinema.com/cinema/adriano/"},
+            {"name": "Cinema Giulio Cesare", "url": "https://www.circuitocinema.com/cinema/giulio-cesare/"},
+            {"name": "Cinema Eurcine", "url": "https://www.circuitocinema.com/cinema/eurcine/"},
+            {"name": "Cinema Lux", "url": "https://www.circuitocinema.com/cinema/lux/"},
+            {"name": "Cinema Odeon", "url": "https://www.circuitocinema.com/cinema/odeon/"},
+            {"name": "Cinema Mignon", "url": "https://www.circuitocinema.com/cinema/mignon/"},
+            {"name": "Cinema Savoy", "url": "https://www.circuitocinema.com/cinema/savoy/"}
+        ]
+
+        for cc in circuito_cinemas:
+            if any(cc["name"].lower() in c["name"].lower() for c in cinema_list):
+                continue
+            try:
+                page.goto(cc["url"], wait_until="domcontentloaded", timeout=20000)
+                page.wait_for_timeout(3000)
+                items = extract_today_from_webtic_dom(page)
+                print(f"→ [Circuito Cinema] {cc['name']}: {len(items)} film")
+                for it in items:
+                    add_screening(it["title"], cc["name"], "Roma", it["times"], cc["url"], it["poster"])
+            except Exception as e:
+                print(f"  Errore Circuito Cinema {cc['name']}: {e}")
 
         browser.close()
 
@@ -282,8 +261,6 @@ def scrape_all_rome_cinemas():
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             json.dump(movies_list, f, ensure_ascii=False, indent=2)
         print(f"\n✅ Salvati {len(movies_list)} film totali in '{OUTPUT_FILE}'.")
-    else:
-        print("\n⚠️ Nessun dato estratto.")
 
 if __name__ == "__main__":
-    scrape_all_rome_cinemas()
+    scrape_all_rome()
