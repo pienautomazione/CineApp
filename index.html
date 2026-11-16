@@ -1,0 +1,512 @@
+
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cinema — MVP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #000000;
+      color: #f5f5f7;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .glass-bar {
+      background: rgba(18, 18, 20, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .poster-card {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+    }
+    .poster-card:active {
+      transform: scale(0.96);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-black selection:bg-white selection:text-black">
+
+  <!-- App Container -->
+  <div class="w-full max-w-md min-h-screen bg-[#0a0a0c] flex flex-col relative pb-16">
+
+    <!-- Header Minimale stile Apple -->
+    <header class="pt-8 pb-4 px-6">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-400 mb-1">In Sala • Roma</p>
+      <h1 class="text-[28px] font-bold tracking-tight text-white leading-tight">Scegli il tuo film</h1>
+    </header>
+
+    <!-- Search Bar stile Google + Glassmorphism Apple -->
+    <div class="px-5 pt-2 pb-4 sticky top-0 z-30 glass-bar border-b border-white/[0.06]">
+      <div class="relative">
+        <div class="flex items-center bg-[#1c1c1e] focus-within:bg-[#242427] transition-colors rounded-full px-4 py-3.5 shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-white/[0.08] focus-within:border-white/25">
+          <svg class="w-4 h-4 text-neutral-400 mr-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+          </svg>
+          <input 
+            id="searchInput" 
+            type="text" 
+            placeholder="Film, città o cinema..." 
+            class="w-full bg-transparent text-[15px] text-white placeholder-neutral-500 focus:outline-none font-normal"
+            autocomplete="off"
+          />
+          <button id="clearInputBtn" class="hidden text-neutral-400 hover:text-white ml-2 bg-white/10 rounded-full w-5 h-5 flex items-center justify-center text-[11px] transition">✕</button>
+        </div>
+
+        <!-- Dropdown Suggerimenti stile Google -->
+        <div id="suggestionsBox" class="hidden absolute left-0 right-0 mt-2 bg-[#1c1c1e]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-40 max-h-72 overflow-y-auto divide-y divide-white/[0.06]">
+          <!-- Popolato via JS -->
+        </div>
+      </div>
+
+      <!-- Filtri Attivi (Pillole Bianche ad alto contrasto stile Apple) -->
+      <div id="activeFiltersContainer" class="flex flex-wrap gap-2 mt-3 empty:mt-0">
+        <!-- Popolato via JS -->
+      </div>
+
+      <!-- Quick Chips -->
+      <div class="flex gap-2 overflow-x-auto no-scrollbar mt-3">
+        <button onclick="addFilter('city', 'Roma')" class="shrink-0 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 px-3.5 py-1.5 rounded-full transition">Roma</button>
+        <button onclick="addFilter('cinema', 'Cinema Barberini')" class="shrink-0 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 px-3.5 py-1.5 rounded-full transition">Barberini</button>
+        <button onclick="addFilter('cinema', 'The Space Parco de\' Medici')" class="shrink-0 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 px-3.5 py-1.5 rounded-full transition">The Space Medici</button>
+        <button onclick="addFilter('cinema', 'Cinema Troisi')" class="shrink-0 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 px-3.5 py-1.5 rounded-full transition">Troisi</button>
+        <button onclick="addFilter('cinema', 'Cinema Quattro Fontane')" class="shrink-0 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 px-3.5 py-1.5 rounded-full transition">Quattro Fontane</button>
+      </div>
+    </div>
+
+    <!-- Barra Stato Risultati -->
+    <div class="px-6 pt-5 pb-3 flex justify-between items-center">
+      <span id="resultsCount" class="text-xs font-medium text-neutral-400">In programmazione</span>
+      <button id="resetAllBtn" onclick="resetFilters()" class="hidden text-xs font-medium text-white/80 hover:text-white transition">Cancella filtri</button>
+    </div>
+
+    <!-- Feed Locandine stile Netflix / Apple TV -->
+    <main id="moviesGrid" class="px-5 grid grid-cols-2 gap-x-4 gap-y-6">
+      <!-- Popolato via JS -->
+    </main>
+
+    <!-- Empty State Pulito -->
+    <div id="emptyState" class="hidden flex-col items-center justify-center text-center px-10 py-20">
+      <div class="w-12 h-12 rounded-full bg-white/[0.05] flex items-center justify-center mb-4 text-neutral-400">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-3.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-1.5A1.125 1.125 0 0118 18.375M20.625 4.5H3.375m17.25 0c.621 0 1.125.504 1.125 1.125M20.625 4.5h-1.5C18.504 4.5 18 5.004 18 5.625m3.75 0v1.5c0 .621-.504 1.125-1.125 1.125M3.375 4.5c-.621 0-1.125.504-1.125 1.125M3.375 4.5h1.5C5.496 4.5 6 5.004 6 5.625m-3.75 0v1.5c0 .621.504 1.125 1.125 1.125m0 0h1.5m-1.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m1.5-3.75C5.496 8.25 6 8.754 6 9.375v1.5m0-5.25v5.25m0-5.25C6 5.004 6.504 4.5 7.125 4.5h9.75c.621 0 1.125.504 1.125 1.125m1.125 2.625h1.5m-1.5 0A1.125 1.125 0 0118 7.125v-1.5m1.125 2.625c-.621 0-1.125.504-1.125 1.125v1.5m2.625-2.625c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125M18 5.625v5.25M7.125 12h9.75m-9.75 0A1.125 1.125 0 016 10.875M7.125 12C6.504 12 6 12.504 6 13.125m0-2.25C6 11.496 5.496 12 4.875 12M18 10.875c0 .621-.504 1.125-1.125 1.125M18 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m-12 5.25v-5.25m0 5.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125m-12 0v-1.5c0-.621-.504-1.125-1.125-1.125M18 18.375v-5.25m0 5.25v-1.5c0-.621.504-1.125 1.125-1.125M18 13.125v1.5c0 .621.504 1.125 1.125 1.125M18 13.125c0-.621.504-1.125 1.125-1.125M6 13.125v1.5c0 .621-.504 1.125-1.125 1.125M6 13.125C6 12.504 5.496 12 4.875 12m-1.5 0h1.5m-1.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M19.125 12h1.5m0 0c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h1.5m14.25 0h1.5" />
+        </svg>
+      </div>
+      <h3 class="text-[15px] font-semibold text-white">Nessuna proiezione trovata</h3>
+      <p class="text-xs text-neutral-400 mt-1.5 leading-relaxed">Nessun film corrisponde alla combinazione selezionata.</p>
+      <button onclick="resetFilters()" class="mt-5 px-5 py-2.5 bg-white text-black font-semibold text-xs rounded-full hover:bg-neutral-200 transition">Mostra tutto</button>
+    </div>
+
+  </div>
+
+  <!-- MODALE SCHEDA DETTAGLIO FILM (Stile Apple TV / Netflix) -->
+  <div id="movieModal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-xl overflow-y-auto flex justify-center">
+    <div class="w-full max-w-md min-h-screen bg-[#0a0a0c] flex flex-col relative pb-20">
+      
+      <!-- Header con tasto Chiudi -->
+      <div class="sticky top-0 z-20 flex items-center justify-between px-5 py-4 bg-[#0a0a0c]/80 backdrop-blur-md border-b border-white/[0.06]">
+        <button onclick="closeMovieModal()" class="flex items-center gap-1.5 text-sm font-medium text-white/90 hover:text-white">
+          <span class="text-lg leading-none">‹</span> Indietro
+        </button>
+        <span class="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">Scheda Film</span>
+        <div class="w-12"></div>
+      </div>
+
+      <!-- Contenuto dinamico popolato via JS -->
+      <div id="modalContent" class="px-5 pt-5"></div>
+
+    </div>
+  </div>
+
+  <script>
+    const MOVIES = [
+      {
+        id: 1,
+        title: "Wild Horse Nine",
+        genre: "Drammatico",
+        duration: "2h 08m",
+        rating: "8.4",
+        gradient: "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+        accent: "bg-amber-500/20 text-amber-300",
+        tag: "NUOVO",
+        screenings: [
+          { city: "Roma", cinema: "Cinema Barberini", zone: "Centro" },
+          { city: "Roma", cinema: "Cinema Quattro Fontane", zone: "Centro" },
+          { city: "Roma", cinema: "Cinema Troisi", zone: "Trastevere" }
+        ]
+      },
+      {
+        id: 2,
+        title: "L'Orizzonte di Pietra",
+        genre: "Sci-Fi",
+        duration: "2h 22m",
+        rating: "8.1",
+        gradient: "from-[#162942] via-[#101824] to-[#0a0a0c]",
+        accent: "bg-sky-500/20 text-sky-300",
+        tag: "IMAX",
+        screenings: [
+          { city: "Roma", cinema: "The Space Parco de' Medici", zone: "Magliana" },
+          { city: "Roma", cinema: "UCI Porta di Roma", zone: "Bufalotta" },
+          { city: "Roma", cinema: "Cinema Adriano", zone: "Prati" }
+        ]
+      },
+      {
+        id: 3,
+        title: "Notte a Trastevere",
+        genre: "Commedia",
+        duration: "1h 44m",
+        rating: "7.6",
+        gradient: "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+        accent: "bg-rose-500/20 text-rose-300",
+        tag: "ITALIA",
+        screenings: [
+          { city: "Roma", cinema: "Cinema Troisi", zone: "Trastevere" },
+          { city: "Roma", cinema: "Nuovo Sacher", zone: "Trastevere" },
+          { city: "Roma", cinema: "Cinema Barberini", zone: "Centro" }
+        ]
+      },
+      {
+        id: 4,
+        title: "Il Silenzio del Nord",
+        genre: "Thriller",
+        duration: "1h 58m",
+        rating: "7.9",
+        gradient: "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+        accent: "bg-emerald-500/20 text-emerald-300",
+        tag: "V.O.",
+        screenings: [
+          { city: "Roma", cinema: "Cinema Quattro Fontane", zone: "Centro" },
+          { city: "Roma", cinema: "Nuovo Sacher", zone: "Trastevere" }
+        ]
+      },
+      {
+        id: 5,
+        title: "Veloci come il Vento 2",
+        genre: "Azione",
+        duration: "1h 55m",
+        rating: "7.4",
+        gradient: "from-[#421818] via-[#211111] to-[#0a0a0c]",
+        accent: "bg-red-500/20 text-red-300",
+        tag: "TOP 10",
+        screenings: [
+          { city: "Roma", cinema: "The Space Parco de' Medici", zone: "Magliana" },
+          { city: "Roma", cinema: "UCI Porta di Roma", zone: "Bufalotta" },
+          { city: "Roma", cinema: "Cinema Adriano", zone: "Prati" },
+          { city: "Roma", cinema: "Cinema Barberini", zone: "Centro" }
+        ]
+      },
+      {
+        id: 6,
+        title: "Sinfonia d'Autunno",
+        genre: "Biografico",
+        duration: "2h 11m",
+        rating: "8.7",
+        gradient: "from-[#2c1d42] via-[#181224] to-[#0a0a0c]",
+        accent: "bg-purple-500/20 text-purple-300",
+        tag: "FESTIVAL",
+        screenings: [
+          { city: "Roma", cinema: "Cinema Barberini", zone: "Centro" },
+          { city: "Roma", cinema: "Cinema Adriano", zone: "Prati" }
+        ]
+      }
+    ];
+
+    let activeFilters = [];
+    let freeTextQuery = "";
+
+    const searchInput = document.getElementById("searchInput");
+    const suggestionsBox = document.getElementById("suggestionsBox");
+    const activeFiltersContainer = document.getElementById("activeFiltersContainer");
+    const moviesGrid = document.getElementById("moviesGrid");
+    const emptyState = document.getElementById("emptyState");
+    const resultsCount = document.getElementById("resultsCount");
+    const resetAllBtn = document.getElementById("resetAllBtn");
+    const clearInputBtn = document.getElementById("clearInputBtn");
+
+    function getAllSearchableItems() {
+      const items = [];
+      const cities = new Set();
+      const cinemas = new Set();
+
+      MOVIES.forEach(m => {
+        items.push({ type: "movie", label: m.title, sub: m.genre });
+        m.screenings.forEach(s => {
+          cities.add(s.city);
+          cinemas.add(JSON.stringify({ name: s.cinema, city: s.city, zone: s.zone }));
+        });
+      });
+
+      cities.forEach(c => items.push({ type: "city", label: c, sub: "Città" }));
+      cinemas.forEach(cStr => {
+        const c = JSON.parse(cStr);
+        items.push({ type: "cinema", label: c.name, sub: `${c.city} · ${c.zone}` });
+      });
+
+      return items;
+    }
+
+    const ALL_ITEMS = getAllSearchableItems();
+
+    searchInput.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      freeTextQuery = val.toLowerCase();
+      clearInputBtn.classList.toggle("hidden", val.length === 0);
+
+      if (val.length === 0) {
+        suggestionsBox.classList.add("hidden");
+        renderMovies();
+        return;
+      }
+
+      const matches = ALL_ITEMS.filter(item => 
+        item.label.toLowerCase().includes(freeTextQuery)
+      ).slice(0, 6);
+
+      if (matches.length > 0) {
+        suggestionsBox.innerHTML = matches.map(m => {
+          const badge = m.type === "movie" ? "Film" : m.type === "city" ? "Città" : "Sala";
+          return `
+            <button onclick="selectSuggestion('${m.type}', '${m.label.replace(/'/g, "\\'")}')" 
+              class="w-full text-left px-4 py-3 hover:bg-white/[0.06] flex items-center justify-between transition">
+              <div>
+                <div class="text-sm font-medium text-white">${m.label}</div>
+                <div class="text-[11px] text-neutral-400 mt-0.5">${m.sub}</div>
+              </div>
+              <span class="text-[10px] font-medium text-neutral-400 bg-white/[0.06] px-2.5 py-1 rounded-full">${badge}</span>
+            </button>
+          `;
+        }).join("");
+        suggestionsBox.classList.remove("hidden");
+      } else {
+        suggestionsBox.classList.add("hidden");
+      }
+
+      renderMovies();
+    });
+
+    clearInputBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      freeTextQuery = "";
+      clearInputBtn.classList.add("hidden");
+      suggestionsBox.classList.add("hidden");
+      renderMovies();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+        suggestionsBox.classList.add("hidden");
+      }
+    });
+
+    function selectSuggestion(type, value) {
+      addFilter(type, value);
+      searchInput.value = "";
+      freeTextQuery = "";
+      clearInputBtn.classList.add("hidden");
+      suggestionsBox.classList.add("hidden");
+    }
+
+    function addFilter(type, value) {
+      const exists = activeFilters.some(f => f.type === type && f.value === value);
+      if (!exists) {
+        activeFilters.push({ type, value });
+        renderFilters();
+        renderMovies();
+      }
+    }
+
+    function removeFilter(index) {
+      activeFilters.splice(index, 1);
+      renderFilters();
+      renderMovies();
+    }
+
+    function resetFilters() {
+      activeFilters = [];
+      searchInput.value = "";
+      freeTextQuery = "";
+      clearInputBtn.classList.add("hidden");
+      renderFilters();
+      renderMovies();
+    }
+
+    function renderFilters() {
+      activeFiltersContainer.innerHTML = activeFilters.map((f, idx) => `
+        <span class="inline-flex items-center gap-2 bg-white text-black text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+          <span>${f.value}</span>
+          <button onclick="removeFilter(${idx})" class="text-black/60 hover:text-black text-[11px] leading-none">✕</button>
+        </span>
+      `).join("");
+
+      resetAllBtn.classList.toggle("hidden", activeFilters.length === 0 && freeTextQuery === "");
+    }
+
+    function renderMovies() {
+      const filtered = MOVIES.filter(movie => {
+        for (const f of activeFilters) {
+          if (f.type === "movie" && movie.title !== f.value) return false;
+          if (f.type === "city" && !movie.screenings.some(s => s.city === f.value)) return false;
+          if (f.type === "cinema" && !movie.screenings.some(s => s.cinema === f.value)) return false;
+        }
+
+        if (freeTextQuery.length > 0) {
+          const matchTitle = movie.title.toLowerCase().includes(freeTextQuery);
+          const matchScreening = movie.screenings.some(s => 
+            s.city.toLowerCase().includes(freeTextQuery) || 
+            s.cinema.toLowerCase().includes(freeTextQuery)
+          );
+          if (!matchTitle && !matchScreening) return false;
+        }
+
+        return true;
+      });
+
+      resultsCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'titolo' : 'titoli'}`;
+
+      if (filtered.length === 0) {
+        moviesGrid.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        emptyState.classList.add("flex");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      emptyState.classList.remove("flex");
+
+      moviesGrid.innerHTML = filtered.map(movie => `
+        <article onclick="alert('Passo 2: Scheda dettaglio di ${movie.title.replace(/'/g, "\\'")}')" 
+             class="poster-card cursor-pointer group flex flex-col">
+          <!-- Poster Card stile Netflix / Apple TV -->
+          <div class="aspect-[2/3] w-full rounded-2xl bg-gradient-to-b ${movie.gradient} p-3.5 flex flex-col justify-between relative overflow-hidden border border-white/[0.08] shadow-[0_12px_24px_rgba(0,0,0,0.6)]">
+            
+            <!-- Top Badges -->
+            <div class="flex justify-between items-center z-10">
+              <span class="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-md ${movie.accent} backdrop-blur-md">
+                ${movie.tag}
+              </span>
+              <span class="text-[11px] font-semibold text-white/90 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-md">
+                ${movie.rating}
+              </span>
+            </div>
+
+            <!-- Sfumatura inferiore stile Netflix -->
+            <div class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
+
+            <!-- Titolo sulla locandina -->
+            <div class="z-10">
+              <h2 class="text-[15px] font-bold leading-snug text-white tracking-tight group-hover:text-neutral-200 transition">
+                ${movie.title}
+              </h2>
+              <p class="text-[11px] text-neutral-400 mt-1 font-medium">
+                ${movie.genre} · ${movie.duration}
+              </p>
+            </div>
+          </div>
+
+          <!-- Sottotitolo minimale esterno stile Apple TV -->
+          <div class="pt-2 px-0.5 flex items-center justify-between text-[11px] text-neutral-400">
+            <span>${movie.screenings.length} ${movie.screenings.length === 1 ? 'cinema' : 'cinema'}</span>
+            <span class="text-white/70 font-medium">Orari ›</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    renderMovies();
+
+    // Assegna orari standard automaticamente a tutte le sale già presenti
+    const DEFAULT_TIMES = ["16:30", "19:00", "21:30"];
+    MOVIES.forEach(m => {
+      m.screenings.forEach(s => {
+        if (!s.times) s.times = DEFAULT_TIMES;
+      });
+    });
+
+    // Collega il clic sulle locandine all'apertura della scheda film
+    moviesGrid.addEventListener("click", (e) => {
+      const card = e.target.closest("article");
+      if (!card) return;
+      const titleEl = card.querySelector("h2");
+      if (!titleEl) return;
+      const found = MOVIES.find(m => m.title === titleEl.textContent.trim());
+      if (found) openMovieModal(found.id);
+    });
+
+    function closeMovieModal() {
+      document.getElementById("movieModal").classList.add("hidden");
+    }
+
+    function openMovieModal(movieId) {
+      const m = MOVIES.find(x => x.id === movieId);
+      if (!m) return;
+      renderModalBody(m);
+      document.getElementById("movieModal").classList.remove("hidden");
+    }
+
+    function renderModalBody(m) {
+      const cityFilter = activeFilters.find(f => f.type === "city")?.value;
+      const cinemaFilter = activeFilters.find(f => f.type === "cinema")?.value;
+
+      const visibleScreenings = m.screenings.filter(s => {
+        if (cityFilter && s.city !== cityFilter) return false;
+        if (cinemaFilter && s.cinema !== cinemaFilter) return false;
+        return true;
+      });
+
+      const byCity = visibleScreenings.reduce((acc, s) => {
+        (acc[s.city] = acc[s.city] || []).push(s);
+        return acc;
+      }, {});
+
+      const citiesHtml = Object.entries(byCity).map(([city, list]) => `
+        <div class="mt-6">
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-3">${city}</h4>
+          <div class="space-y-3">
+            ${list.map(s => `
+              <div class="p-4 rounded-2xl bg-[#16161a] border border-white/[0.06]">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-sm font-semibold text-white">${s.cinema}</span>
+                  <span class="text-[11px] text-neutral-400">${s.zone}</span>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                  ${s.times.map(t => `
+                    <button
+                      class="px-3.5 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-neutral-200 transition">
+                      ${t}
+                    </button>
+                  `).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("modalContent").innerHTML = `
+        <div class="flex gap-4 items-end">
+          <div class="w-28 aspect-[2/3] rounded-2xl bg-gradient-to-b ${m.gradient} border border-white/10 shrink-0 p-2.5 flex flex-col justify-between">
+            <span class="text-[8px] font-bold px-1.5 py-0.5 rounded ${m.accent} self-start">${m.tag}</span>
+            <span class="text-[11px] font-bold text-white">${m.rating}</span>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-400">${m.genre} · ${m.duration}</p>
+            <h2 class="text-2xl font-bold text-white tracking-tight mt-1">${m.title}</h2>
+          </div>
+        </div>
+        <p class="text-xs text-neutral-400 leading-relaxed mt-5">
+          Trama di prova: un racconto intenso tra atmosfere urbane e scelte decisive, perfetto per una serata sul grande schermo.
+        </p>
+        ${citiesHtml || '<p class="text-xs text-neutral-500 mt-6">Nessun orario disponibile per i filtri selezionati.</p>'}
+      `;
+    }
+
+  </script>
+</body>
+</html>
