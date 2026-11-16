@@ -1,27 +1,41 @@
 import json
 import re
 from datetime import datetime
+from urllib.parse import urljoin
 from playwright.sync_api import sync_playwright
 
 OUTPUT_FILE = "movies.json"
 
-ROME_CINEMAS = [
-    {"name": "Cinema Adriano", "keyword": "Adriano", "zone": "Prati"},
-    {"name": "Cinema Barberini", "keyword": "Barberini", "zone": "Centro"},
-    {"name": "Cinema Quattro Fontane", "keyword": "Quattro Fontane", "zone": "Centro"},
-    {"name": "Cinema Giulio Cesare", "keyword": "Giulio Cesare", "zone": "Prati"},
-    {"name": "Cinema Troisi", "keyword": "Troisi", "zone": "Trastevere"},
-    {"name": "Nuovo Sacher", "keyword": "Sacher", "zone": "Trastevere"},
-    {"name": "Cinema Eurcine", "keyword": "Eurcine", "zone": "EUR"},
-    {"name": "Cinema Lux", "keyword": "Lux", "zone": "Trieste / Salario"},
-    {"name": "Cinema Odeon", "keyword": "Odeon", "zone": "Trieste / Salario"},
-    {"name": "Cinema Greenwich", "keyword": "Greenwich", "zone": "Testaccio"},
-    {"name": "Cinema Madison", "keyword": "Madison", "zone": "San Paolo"},
-    {"name": "Cinema Atlantic", "keyword": "Atlantic", "zone": "Tuscolana"},
-    {"name": "Cinema Antares", "keyword": "Antares", "zone": "Monte Sacro"},
-    {"name": "Cinema Broadway", "keyword": "Broadway", "zone": "Prenestina"},
-    {"name": "Azzurro Scipioni", "keyword": "Azzurro Scipioni", "zone": "Prati"}
-]
+ROME_ZONES = {
+    "barberini": "Centro",
+    "quattro fontane": "Centro",
+    "farnese": "Campo de' Fiori",
+    "fiamma": "Centro",
+    "troisi": "Trastevere",
+    "nuovo sacher": "Trastevere",
+    "sacher": "Trastevere",
+    "intrastevere": "Trastevere",
+    "adriano": "Prati",
+    "eden": "Prati",
+    "giulio cesare": "Prati",
+    "azzurro scipioni": "Prati",
+    "lux": "Trieste / Salario",
+    "odeon": "Trieste / Salario",
+    "savoy": "Salario",
+    "mignon": "Salario",
+    "greenwich": "Testaccio",
+    "eurcine": "EUR",
+    "atlantic": "Tuscolana",
+    "madison": "San Paolo",
+    "antares": "Monte Sacro",
+    "broadway": "Prenestina",
+    "tibur": "San Lorenzo",
+    "andromeda": "Termini",
+    "caravaggio": "Parioli",
+    "maestoso": "Appia",
+    "reale": "Trastevere",
+    "alhambra": "Prati"
+}
 
 GRADIENTS = [
     ("from-[#3a2818] via-[#1c1613] to-[#0a0a0c]", "bg-amber-500/20 text-amber-300"),
@@ -31,42 +45,81 @@ GRADIENTS = [
     ("from-[#2c1d42] via-[#181224] to-[#0a0a0c]", "bg-purple-500/20 text-purple-300")
 ]
 
+# Estrae direttamente dal DOM della scheda cinema: Titolo + Locandina reale + Orari
+EXTRACT_MOVIES_DOM_JS = """
+() => {
+    const timeRegex = /\\b([01]?\\d|2[0-3]):[0-5]\\d\\b/g;
+    const results = [];
+    const seen = new Set();
+
+    // Cerca tutti i contenitori che hanno un'immagine locandina o un titolo e degli orari
+    const cards = document.querySelectorAll('article, [class*="event"], [class*="movie"], [class*="film"], [class*="card"], [class*="item"], li, div');
+
+    cards.forEach(card => {
+        if (card.children.length > 15) return;
+        const text = (card.innerText || '').trim();
+        if (text.length < 10 || text.length > 800) return;
+
+        const matches = text.match(timeRegex);
+        if (!matches || matches.length === 0 || matches.length > 18) return;
+
+        // Cerca il titolo principale del film
+        const titleEl = card.querySelector('h1, h2, h3, h4, h5, [class*="title"], [class*="titolo"], [class*="name"], strong, b');
+        if (!titleEl) return;
+
+        const rawTitle = (titleEl.innerText || '').trim();
+        if (rawTitle.length < 2 || rawTitle.length > 80 || timeRegex.test(rawTitle)) return;
+        if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio|via |viale |piazza |tel\\.|sala \\d/i.test(rawTitle)) return;
+
+        // Cerca la locandina reale associata a questo film (risalendo al massimo di 2 livelli se serve)
+        let poster = '';
+        let searchBox = card;
+        for (let i = 0; i < 3 && searchBox; i++) {
+            const imgs = searchBox.querySelectorAll('img');
+            for (const img of imgs) {
+                const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
+                if (src && src.startsWith('http') && !/logo|icon|avatar|flag|banner|placeholder/i.test(src)) {
+                    poster = src;
+                    break;
+                }
+            }
+            if (poster) break;
+            searchBox = searchBox.parentElement;
+        }
+
+        const key = rawTitle.toLowerCase();
+        if (!seen.has(key)) {
+            seen.add(key);
+            results.push({
+                title: rawTitle,
+                times: [...new Set(matches)],
+                poster: poster
+            });
+        }
+    });
+
+    return results;
+}
+"""
+
+def detect_zone(cinema_name: str) -> str:
+    lower_name = cinema_name.lower()
+    for key, zone in ROME_ZONES.items():
+        if key in lower_name:
+            return zone
+    return "Roma"
+
+def clean_cinema_name(raw_name: str) -> str:
+    # Ripulisce eventuali righe extra (es. indirizzo o "Roma") dal nome del cinema
+    first_line = raw_name.splitlines()[0].strip()
+    cleaned = re.sub(r"\s*[-–|]\s*Roma$", "", first_line, flags=re.IGNORECASE).strip()
+    return cleaned or first_line
+
 def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"\s*[\(\[](?:V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB ITA|VM\d+)[\)\]]", "", raw, flags=re.IGNORECASE)
     return " ".join(cleaned.split()).strip().title()
 
-def extract_from_json_payload(payload, found_list):
-    if isinstance(payload, dict):
-        # Cerca qualsiasi oggetto che abbia un titolo e una lista di spettacoli/orari
-        title = ""
-        for k in ["Title", "title", "EventName", "eventName", "MovieTitle", "movieTitle", "Descrizione", "descrizione"]:
-            if isinstance(payload.get(k), str) and len(payload[k].strip()) >= 2:
-                title = payload[k].strip()
-                break
-
-        if title:
-            raw_str = json.dumps(payload)
-            times = list(dict.fromkeys(re.findall(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", raw_str)))
-            poster = ""
-            for pk in ["Poster", "poster", "Image", "image", "ImageUrl", "imageUrl", "Locandina", "locandina", "Picture"]:
-                if isinstance(payload.get(pk), str) and payload[pk].startswith("http"):
-                    poster = payload[pk]
-                    break
-            if times:
-                found_list.append({
-                    "title": title,
-                    "times": times,
-                    "poster": poster
-                })
-
-        for v in payload.values():
-            extract_from_json_payload(v, found_list)
-    elif isinstance(payload, list):
-        for item in payload:
-            extract_from_json_payload(item, found_list)
-
-def parse_visible_text(body_text: str) -> list:
-    """Associa ogni blocco titolo agli orari HH:MM che compaiono nelle righe successive."""
+def parse_visible_text_fallback(body_text: str) -> list:
     lines = [l.strip() for l in body_text.splitlines() if l.strip()]
     results = []
     current_title = ""
@@ -103,8 +156,8 @@ def parse_visible_text(body_text: str) -> list:
         })
     return results
 
-def scrape_with_browser():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Apertura diretta lista cinema di Roma su Webtic...")
+def scrape_all_rome_cinemas():
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Scansione COMPLETA sale di Roma su Webtic...")
     movies_dict = {}
     counter = 1
 
@@ -120,7 +173,6 @@ def scrape_with_browser():
         )
         page = context.new_page()
 
-        # URL diretto della provincia di Roma scoperto dal log!
         rome_list_url = "https://www.webtic.it/app/main/all-locals/RM"
         page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
         page.wait_for_timeout(3000)
@@ -133,60 +185,64 @@ def scrape_with_browser():
             except Exception:
                 pass
 
-        first_cinema_logged = False
+        # Scorre verso il basso per caricare tutti i cinema (incluso Circuito Cinema)
+        for _ in range(5):
+            page.mouse.wheel(0, 1500)
+            page.wait_for_timeout(500)
 
-        for cinema in ROME_CINEMAS:
+        # Raccoglie TUTTI i link ai locali presenti nella pagina di Roma
+        raw_links = page.evaluate("""
+        () => {
+            const items = [];
+            const seenUrls = new Set();
+            document.querySelectorAll('a[href]').forEach(a => {
+                const href = a.href || '';
+                const text = (a.innerText || '').trim();
+                // Esclude i link di navigazione generica
+                if (href.includes('/app/') && !href.includes('/all-locals') && !href.includes('/all-provinces') && !href.includes('/home') && !href.includes('/events')) {
+                    if (text.length >= 3 && !seenUrls.has(href)) {
+                        seenUrls.add(href);
+                        items.push({ name: text, url: href });
+                    }
+                }
+            });
+            return items;
+        }
+        """)
+
+        # Filtra fuori eventuali cinema fuori comune di Roma (es. Santa Marinella, Civitavecchia, ecc.)
+        excluded_towns = ["santa marinella", "civitavecchia", "velletri", "tivoli", "frascati", "albano", "anzio", "nettuno", "pomezia", "guidonia", "colleferro", "bracciano", "fiumicino"]
+        cinema_list = []
+        for item in raw_links:
+            c_name = clean_cinema_name(item["name"])
+            if any(town in c_name.lower() for town in excluded_towns):
+                continue
+            cinema_list.append({"name": c_name, "url": item["url"]})
+
+        print(f"Trovate {len(cinema_list)} sale a Roma: {[c['name'] for c in cinema_list]}")
+
+        for cinema in cinema_list:
+            print(f"→ Apertura {cinema['name']}...")
             try:
-                if page.url != rome_list_url:
-                    page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
-                    page.wait_for_timeout(2500)
+                page.goto(cinema["url"], wait_until="domcontentloaded", timeout=20000)
+                page.wait_for_timeout(3000)
 
-                cinema_el = page.get_by_text(cinema["keyword"], exact=False).first
-                if not cinema_el.is_visible(timeout=1200):
-                    continue
+                extracted = page.evaluate(EXTRACT_MOVIES_DOM_JS)
+                if not extracted:
+                    extracted = parse_visible_text_fallback(page.inner_text("body"))
 
-                print(f"→ Apertura {cinema['name']}...")
-                intercepted_items = []
+                print(f"  Estratti {len(extracted)} film (con locandine: {sum(1 for x in extracted if x.get('poster'))}).")
 
-                def handle_response(response):
-                    try:
-                        ct = response.headers.get("content-type", "")
-                        if "json" in ct and response.status == 200:
-                            data = response.json()
-                            extract_from_json_payload(data, intercepted_items)
-                    except Exception:
-                        pass
+                zone = detect_zone(cinema["name"])
 
-                page.on("response", handle_response)
-                cinema_el.click()
-                page.wait_for_timeout(4000)
-                booking_url = page.url
-
-                body_text = page.inner_text("body")
-                if not first_cinema_logged:
-                    preview = " | ".join([l.strip() for l in body_text.splitlines() if l.strip()][:28])
-                    print(f"  [Scheda {cinema['name']} - URL: {booking_url}]: {preview}")
-                    first_cinema_logged = True
-
-                if not intercepted_items:
-                    intercepted_items = parse_visible_text(body_text)
-
-                page.remove_listener("response", handle_response)
-
-                unique_cinema_movies = {}
-                for it in intercepted_items:
-                    nt = normalize_title(it["title"])
-                    if not nt or len(nt) < 2:
+                for item in extracted:
+                    norm_title = normalize_title(item["title"])
+                    if not norm_title or len(norm_title) < 2:
                         continue
-                    if nt not in unique_cinema_movies:
-                        unique_cinema_movies[nt] = it
-                    else:
-                        unique_cinema_movies[nt]["times"] = list(dict.fromkeys(unique_cinema_movies[nt]["times"] + it["times"]))
 
-                print(f"  Trovati {len(unique_cinema_movies)} film.")
-
-                for norm_title, item in unique_cinema_movies.items():
-                    poster = item["poster"] if item["poster"].startswith("http") else ""
+                    poster = item.get("poster", "")
+                    if poster and poster.startswith("/"):
+                        poster = urljoin(cinema["url"], poster)
 
                     if norm_title not in movies_dict:
                         grad, acc = GRADIENTS[(counter - 1) % len(GRADIENTS)]
@@ -196,7 +252,7 @@ def scrape_with_browser():
                             "genre": "In Sala · Roma",
                             "duration": "Programmazione odierna",
                             "rating": "★",
-                            "posterUrl": poster,
+                            "posterUrl": poster if poster.startswith("http") else "",
                             "gradient": grad,
                             "accent": acc,
                             "tag": "ROMA",
@@ -204,16 +260,16 @@ def scrape_with_browser():
                             "screenings": []
                         }
                         counter += 1
-                    elif not movies_dict[norm_title]["posterUrl"] and poster:
+                    elif not movies_dict[norm_title]["posterUrl"] and poster.startswith("http"):
                         movies_dict[norm_title]["posterUrl"] = poster
 
                     if not any(s["cinema"] == cinema["name"] for s in movies_dict[norm_title]["screenings"]):
                         movies_dict[norm_title]["screenings"].append({
                             "city": "Roma",
                             "cinema": cinema["name"],
-                            "zone": cinema["zone"],
+                            "zone": zone,
                             "times": item["times"],
-                            "bookingUrl": booking_url
+                            "bookingUrl": cinema["url"]
                         })
 
             except Exception as e:
@@ -227,7 +283,7 @@ def scrape_with_browser():
             json.dump(movies_list, f, ensure_ascii=False, indent=2)
         print(f"\n✅ Salvati {len(movies_list)} film totali in '{OUTPUT_FILE}'.")
     else:
-        print("\n⚠️ Nessun dato estratto in questo giro.")
+        print("\n⚠️ Nessun dato estratto.")
 
 if __name__ == "__main__":
-    scrape_with_browser()
+    scrape_all_rome_cinemas()
