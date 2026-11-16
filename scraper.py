@@ -6,9 +6,9 @@ from playwright.sync_api import sync_playwright
 OUTPUT_FILE = "movies.json"
 
 ROME_CINEMAS = [
+    {"name": "Cinema Adriano", "keyword": "Adriano", "zone": "Prati"},
     {"name": "Cinema Barberini", "keyword": "Barberini", "zone": "Centro"},
     {"name": "Cinema Quattro Fontane", "keyword": "Quattro Fontane", "zone": "Centro"},
-    {"name": "Cinema Adriano", "keyword": "Adriano", "zone": "Prati"},
     {"name": "Cinema Giulio Cesare", "keyword": "Giulio Cesare", "zone": "Prati"},
     {"name": "Cinema Troisi", "keyword": "Troisi", "zone": "Trastevere"},
     {"name": "Nuovo Sacher", "keyword": "Sacher", "zone": "Trastevere"},
@@ -16,7 +16,11 @@ ROME_CINEMAS = [
     {"name": "Cinema Lux", "keyword": "Lux", "zone": "Trieste / Salario"},
     {"name": "Cinema Odeon", "keyword": "Odeon", "zone": "Trieste / Salario"},
     {"name": "Cinema Greenwich", "keyword": "Greenwich", "zone": "Testaccio"},
-    {"name": "Cinema Madison", "keyword": "Madison", "zone": "San Paolo"}
+    {"name": "Cinema Madison", "keyword": "Madison", "zone": "San Paolo"},
+    {"name": "Cinema Atlantic", "keyword": "Atlantic", "zone": "Tuscolana"},
+    {"name": "Cinema Antares", "keyword": "Antares", "zone": "Monte Sacro"},
+    {"name": "Cinema Broadway", "keyword": "Broadway", "zone": "Prenestina"},
+    {"name": "Azzurro Scipioni", "keyword": "Azzurro Scipioni", "zone": "Prati"}
 ]
 
 GRADIENTS = [
@@ -33,31 +37,26 @@ def normalize_title(raw: str) -> str:
 
 def extract_from_json_payload(payload, found_list):
     if isinstance(payload, dict):
-        title = (
-            payload.get("Title") or payload.get("title") or
-            payload.get("EventName") or payload.get("eventName") or
-            payload.get("Name") or payload.get("name") or ""
-        )
-        performances = (
-            payload.get("Performances") or payload.get("performances") or
-            payload.get("Shows") or payload.get("shows") or
-            payload.get("Events") or payload.get("events") or
-            payload.get("Schedule") or payload.get("schedule") or []
-        )
-        poster = (
-            payload.get("Poster") or payload.get("poster") or
-            payload.get("Image") or payload.get("image") or
-            payload.get("ImageUrl") or payload.get("imageUrl") or ""
-        )
+        # Cerca qualsiasi oggetto che abbia un titolo e una lista di spettacoli/orari
+        title = ""
+        for k in ["Title", "title", "EventName", "eventName", "MovieTitle", "movieTitle", "Descrizione", "descrizione"]:
+            if isinstance(payload.get(k), str) and len(payload[k].strip()) >= 2:
+                title = payload[k].strip()
+                break
 
-        if isinstance(title, str) and len(title.strip()) >= 2 and isinstance(performances, list) and len(performances) > 0:
-            raw_str = json.dumps(performances)
+        if title:
+            raw_str = json.dumps(payload)
             times = list(dict.fromkeys(re.findall(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", raw_str)))
+            poster = ""
+            for pk in ["Poster", "poster", "Image", "image", "ImageUrl", "imageUrl", "Locandina", "locandina", "Picture"]:
+                if isinstance(payload.get(pk), str) and payload[pk].startswith("http"):
+                    poster = payload[pk]
+                    break
             if times:
                 found_list.append({
-                    "title": title.strip(),
+                    "title": title,
                     "times": times,
-                    "poster": poster if isinstance(poster, str) else ""
+                    "poster": poster
                 })
 
         for v in payload.values():
@@ -67,31 +66,45 @@ def extract_from_json_payload(payload, found_list):
             extract_from_json_payload(item, found_list)
 
 def parse_visible_text(body_text: str) -> list:
+    """Associa ogni blocco titolo agli orari HH:MM che compaiono nelle righe successive."""
     lines = [l.strip() for l in body_text.splitlines() if l.strip()]
     results = []
     current_title = ""
+    current_times = []
     time_re = re.compile(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b")
+    ignore_re = re.compile(
+        r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|cinema|teatri|musical|tutta italia|crea informatica|provincia|roma|lazio|via |viale |piazza |tel\.|info@|scheda|dettagli|sala \d",
+        re.I
+    )
 
     for line in lines:
         times = time_re.findall(line)
         if times:
             if current_title:
+                current_times.extend(times)
+        else:
+            if current_title and current_times:
                 results.append({
                     "title": current_title,
-                    "times": list(dict.fromkeys(times)),
+                    "times": list(dict.fromkeys(current_times)),
                     "poster": ""
                 })
-        else:
-            if 3 <= len(line) <= 75 and not re.search(
-                r"webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|cinema|teatri|musical|tutta italia|nessun risultato|crea informatica|roma|lazio",
-                line,
-                re.I
-            ):
+                current_title = ""
+                current_times = []
+
+            if 3 <= len(line) <= 70 and not ignore_re.search(line) and not line.isdigit():
                 current_title = line
+
+    if current_title and current_times:
+        results.append({
+            "title": current_title,
+            "times": list(dict.fromkeys(current_times)),
+            "poster": ""
+        })
     return results
 
 def scrape_with_browser():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Apertura elenco province Webtic...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Apertura diretta lista cinema di Roma su Webtic...")
     movies_dict = {}
     counter = 1
 
@@ -107,8 +120,9 @@ def scrape_with_browser():
         )
         page = context.new_page()
 
-        # 1. Vai direttamente alla pagina delle province e clicca su "Roma"
-        page.goto("https://www.webtic.it/app/main/all-provinces", wait_until="domcontentloaded", timeout=25000)
+        # URL diretto della provincia di Roma scoperto dal log!
+        rome_list_url = "https://www.webtic.it/app/main/all-locals/RM"
+        page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
         page.wait_for_timeout(3000)
 
         for btn_text in ["Accetta", "Accetto", "Accept"]:
@@ -119,34 +133,16 @@ def scrape_with_browser():
             except Exception:
                 pass
 
-        # Clicca sulla voce "Roma" nell'elenco delle province
-        try:
-            roma_el = page.get_by_text("Roma", exact=True).first
-            if roma_el.is_visible(timeout=3000):
-                roma_el.click()
-            else:
-                page.get_by_text("Roma", exact=False).first.click()
-            page.wait_for_timeout(3500)
-        except Exception as e:
-            print(f"Errore click su provincia Roma: {e}")
+        first_cinema_logged = False
 
-        rome_list_url = page.url
-        print(f"URL pagina cinema di Roma: {rome_list_url}")
-
-        # Legge i cinema elencati nella pagina di Roma
-        body_preview = " | ".join([l.strip() for l in page.inner_text("body").splitlines() if l.strip()][:20])
-        print(f"Contenuto pagina Roma: {body_preview}")
-
-        # 2. Per ogni cinema di Roma presente, clicca sul suo nome per aprire i film e gli orari
         for cinema in ROME_CINEMAS:
             try:
-                # Torna alla lista dei cinema di Roma se ci siamo spostati
                 if page.url != rome_list_url:
                     page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
                     page.wait_for_timeout(2500)
 
                 cinema_el = page.get_by_text(cinema["keyword"], exact=False).first
-                if not cinema_el.is_visible(timeout=1500):
+                if not cinema_el.is_visible(timeout=1200):
                     continue
 
                 print(f"→ Apertura {cinema['name']}...")
@@ -163,11 +159,16 @@ def scrape_with_browser():
 
                 page.on("response", handle_response)
                 cinema_el.click()
-                page.wait_for_timeout(3500)
+                page.wait_for_timeout(4000)
                 booking_url = page.url
 
+                body_text = page.inner_text("body")
+                if not first_cinema_logged:
+                    preview = " | ".join([l.strip() for l in body_text.splitlines() if l.strip()][:28])
+                    print(f"  [Scheda {cinema['name']} - URL: {booking_url}]: {preview}")
+                    first_cinema_logged = True
+
                 if not intercepted_items:
-                    body_text = page.inner_text("body")
                     intercepted_items = parse_visible_text(body_text)
 
                 page.remove_listener("response", handle_response)
@@ -175,7 +176,7 @@ def scrape_with_browser():
                 unique_cinema_movies = {}
                 for it in intercepted_items:
                     nt = normalize_title(it["title"])
-                    if not nt:
+                    if not nt or len(nt) < 2:
                         continue
                     if nt not in unique_cinema_movies:
                         unique_cinema_movies[nt] = it
