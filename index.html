@@ -6,9 +6,8 @@
   <title>CineApp · Biglietteria & Orari</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #0a0a0c; color: #f4f4f6; -webkit-tap-highlight-color: transparent; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    body { background:#0a0a0c; color:#f4f4f6; -webkit-tap-highlight-color:transparent; }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
   </style>
 </head>
 <body class="min-h-screen pb-24 font-sans antialiased">
@@ -21,35 +20,207 @@
           <h1 class="text-2xl font-bold tracking-tight text-white">CineApp</h1>
         </div>
         <div class="flex items-center gap-2">
-          <button id="resetFiltersBtn" onclick="resetAllFilters()" class="hidden text-xs text-amber-400 hover:underline px-2 py-1">
-            Azzera
-          </button>
+          <button id="resetBtn" onclick="resetAll()" class="hidden text-xs text-amber-400 px-2 py-1">Azzera</button>
           <span id="movieCount" class="text-xs bg-white/10 text-zinc-300 px-2.5 py-1 rounded-full">Caricamento...</span>
         </div>
       </div>
 
-      <!-- 1. Campo Titolo con suggerimenti live -->
       <div class="relative mb-2.5">
-        <input
-          id="titleInput"
-          type="text"
-          autocomplete="off"
-          placeholder="Cerca titolo del film..."
-          class="w-full bg-white/10 text-white placeholder-zinc-400 text-sm rounded-xl pl-10 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
-        />
-        <svg class="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
-        </svg>
-        <button id="clearTitleBtn" onclick="clearTitle()" class="hidden absolute right-3 top-2.5 text-zinc-400 hover:text-white text-sm">✕</button>
-        <div id="titleSuggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#18181f] border border-white/15 rounded-xl shadow-2xl overflow-hidden z-40 max-h-56 overflow-y-auto"></div>
+        <input id="titleInput" type="text" autocomplete="off" placeholder="Cerca titolo del film..."
+          class="w-full bg-white/10 text-white placeholder-zinc-400 text-sm rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400/60" />
+        <span class="absolute left-3 top-2.5 text-zinc-400 text-sm">🔍</span>
+        <button id="clearBtn" onclick="clearTitle()" class="hidden absolute right-3 top-2.5 text-zinc-400 text-sm">✕</button>
+        <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#18181f] border border-white/15 rounded-xl shadow-2xl overflow-hidden z-40 max-h-56 overflow-y-auto"></div>
       </div>
 
-      <!-- 2. Campo Città + 3. Campo Cinema (abilitato dopo scelta Città) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2.5">
-        <div class="relative">
-          <select
-            id="citySelect"
-            onchange="onCityChange()"
-            class="w-full appearance-none bg-white/10 text-white text-sm rounded-xl px-3.5 py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-amber-400/60 cursor-pointer"
-          >
-            <option value="" class
+        <select id="citySelect" onchange="onCityChange()" class="w-full bg-white/10 text-white text-sm rounded-xl px-3.5 py-2.5 focus:outline-none">
+          <option value="" class="bg-[#141418]">1. Seleziona Città...</option>
+        </select>
+        <select id="cinemaSelect" disabled onchange="renderMovies()" class="w-full bg-white/10 text-white text-sm rounded-xl px-3.5 py-2.5 disabled:opacity-40 focus:outline-none">
+          <option value="" class="bg-[#141418]">2. Prima scegli una città</option>
+        </select>
+      </div>
+
+      <div class="flex gap-2 overflow-x-auto no-scrollbar">
+        <button onclick="setLang('ALL')" id="btnALL" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-black">Tutte le lingue</button>
+        <button onclick="setLang('OV')" id="btnOV" class="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-300">🌍 Versione Originale (V.O.)</button>
+        <button onclick="setLang('ITA')" id="btnITA" class="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-300">🇮🇹 Italiano</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pt-4">
+    <div id="moviesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+  </main>
+
+  <div id="movieModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center">
+    <div class="bg-[#141418] border border-white/10 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88vh] overflow-y-auto p-5">
+      <div class="flex justify-between items-start gap-3 mb-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">IN SALA</span>
+          <h2 id="modalTitle" class="text-xl font-bold text-white mt-1"></h2>
+          <p id="modalMeta" class="text-xs text-zinc-400 mt-0.5"></p>
+        </div>
+        <button onclick="closeModal()" class="p-2 rounded-full bg-white/10 text-zinc-300">✕</button>
+      </div>
+      <p id="modalSynopsis" class="text-sm text-zinc-300 mb-4"></p>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2.5">Sale e Orari</h3>
+      <div id="modalScreenings" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <script>
+    let allMovies = [], lang = "ALL";
+
+    async function loadMovies() {
+      try {
+        const res = await fetch(`./movies.json?t=${Date.now()}`);
+        allMovies = await res.json();
+        const cities = [...new Set(allMovies.flatMap(m => (m.screenings || []).map(s => (s.city || "").trim()).filter(Boolean)))].sort();
+        document.getElementById("citySelect").innerHTML = `<option value="" class="bg-[#141418]">1. Tutte le città (${cities.length})</option>` +
+          cities.map(c => `<option value="${c}" class="bg-[#141418]">${c}</option>`).join("");
+        renderMovies();
+      } catch (e) {
+        document.getElementById("movieCount").textContent = "Errore dati";
+      }
+    }
+
+    function getTimes(s) {
+      return (Array.isArray(s.showtimes) && s.showtimes.length) ? s.showtimes : (s.times || []).map(t => ({ time: t, url: s.bookingUrl || "#" }));
+    }
+
+    function setLang(m) {
+      lang = m;
+      ["ALL", "OV", "ITA"].forEach(k => {
+        document.getElementById("btn" + k).className = k === m
+          ? "px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-black"
+          : "px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-300";
+      });
+      renderMovies();
+    }
+
+    function onCityChange() {
+      const city = document.getElementById("citySelect").value;
+      const sel = document.getElementById("cinemaSelect");
+      if (!city) {
+        sel.disabled = true;
+        sel.innerHTML = `<option value="" class="bg-[#141418]">2. Prima scegli una città</option>`;
+        return renderMovies();
+      }
+      const cinemas = [...new Set(allMovies.flatMap(m => (m.screenings || []).filter(s => (s.city || "").trim() === city).map(s => (s.cinema || "").trim())))].sort();
+      sel.disabled = false;
+      sel.innerHTML = `<option value="" class="bg-[#141418]">Tutti i cinema di ${city} (${cinemas.length})</option>` +
+        cinemas.map(c => `<option value="${c}" class="bg-[#141418]">${c}</option>`).join("");
+      renderMovies();
+    }
+
+    function filterS(list, city, cinema) {
+      return (list || []).filter(s =>
+        (!city || (s.city || "").trim() === city) &&
+        (!cinema || (s.cinema || "").trim() === cinema) &&
+        (lang !== "OV" || s.isOV) &&
+        (lang !== "ITA" || !s.isOV)
+      );
+    }
+
+    function clearTitle() {
+      document.getElementById("titleInput").value = "";
+      document.getElementById("clearBtn").classList.add("hidden");
+      document.getElementById("suggestions").classList.add("hidden");
+      renderMovies();
+    }
+
+    function resetAll() {
+      document.getElementById("titleInput").value = "";
+      document.getElementById("clearBtn").classList.add("hidden");
+      document.getElementById("citySelect").value = "";
+      setLang("ALL");
+      onCityChange();
+    }
+
+    function renderMovies() {
+      const q = document.getElementById("titleInput").value.toLowerCase().trim();
+      const city = document.getElementById("citySelect").value;
+      const cinema = document.getElementById("cinemaSelect").value;
+      document.getElementById("resetBtn").classList.toggle("hidden", !(q || city || cinema || lang !== "ALL"));
+
+      const filtered = allMovies.filter(m => (!q || m.title.toLowerCase().includes(q)) && filterS(m.screenings, city, cinema).length > 0);
+      document.getElementById("movieCount").textContent = `${filtered.length} film`;
+
+      document.getElementById("moviesGrid").innerHTML = filtered.length ? filtered.map(m => {
+        const sc = filterS(m.screenings, city, cinema);
+        const poster = m.posterUrl
+          ? `<div class="w-full h-56 bg-zinc-900 overflow-hidden"><img src="${m.posterUrl}" alt="${m.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.style.display='none'" /></div>`
+          : `<div class="w-full h-36 bg-gradient-to-br ${m.gradient || 'from-zinc-800 to-zinc-950'} flex items-end p-4"><span class="text-xs uppercase tracking-widest text-white/50 font-semibold">Biglietteria Ufficiale</span></div>`;
+
+        return `<article onclick="openModal(${m.id})" class="bg-[#141418] border border-white/10 rounded-2xl overflow-hidden shadow-lg cursor-pointer flex flex-col">
+          ${poster}
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center gap-2 mb-1">
+                <div class="flex gap-1.5">
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">${m.tag || 'ROMA'}</span>
+                  ${sc.some(s => s.isOV) ? `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300">V.O.</span>` : ''}
+                </div>
+                <span class="text-xs text-zinc-400">${sc.length} ${sc.length === 1 ? 'sala' : 'sale'}</span>
+              </div>
+              <h2 class="text-lg font-bold text-white leading-snug">${m.title}</h2>
+            </div>
+            <div>${sc.slice(0, 2).map(s => `
+              <div class="mt-2.5 pt-2.5 border-t border-white/10">
+                <div class="flex justify-between items-center text-xs gap-1.5">
+                  <span class="font-semibold text-zinc-200 truncate">${s.cinema}</span>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="px-1.5 py-0.5 rounded ${s.isOV ? 'bg-sky-500/20 text-sky-300 font-bold' : 'bg-white/10 text-zinc-400'} text-[10px]">${s.isOV ? 'V.O.' : 'ITA'}</span>
+                    <span class="text-zinc-400">${s.zone || s.city}</span>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-1.5 mt-1.5">
+                  ${getTimes(s).slice(0, 6).map(st => `<a href="${st.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="px-2 py-0.5 rounded bg-amber-400/15 text-amber-300 border border-amber-400/30 text-xs font-medium">${st.time}</a>`).join("")}
+                </div>
+              </div>`).join("")}
+            </div>
+          </div>
+        </article>`;
+      }).join("") : `<div class="col-span-full text-center py-12 text-zinc-400 text-sm">Nessun film trovato.</div>`;
+    }
+
+    function openModal(id) {
+      const m = allMovies.find(x => x.id === id);
+      if (!m) return;
+      const sc = filterS(m.screenings, document.getElementById("citySelect").value, document.getElementById("cinemaSelect").value);
+      document.getElementById("modalTitle").textContent = m.title;
+      document.getElementById("modalMeta").textContent = `${m.genre || 'In Sala'} · ${m.duration || 'Oggi'}`;
+      document.getElementById("modalSynopsis").textContent = m.synopsis || "";
+      document.getElementById("modalScreenings").innerHTML = sc.map(s => `
+        <div class="bg-white/5 border border-white/10 rounded-xl p-3">
+          <div class="flex justify-between items-center mb-2 gap-2">
+            <span class="font-semibold text-sm text-white">${s.cinema}</span>
+            <span class="px-2 py-0.5 rounded ${s.isOV ? 'bg-sky-500/20 text-sky-300 font-bold' : 'bg-white/10 text-zinc-300'} text-[10px]">${s.isOV ? '🌍 V.O. · Sub ITA' : '🇮🇹 Italiano'}</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${getTimes(s).map(st => `<a href="${st.url}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-amber-400 text-black text-xs font-bold">${st.time} · Prenota</a>`).join("")}
+          </div>
+        </div>`).join("");
+      document.getElementById("movieModal").classList.remove("hidden");
+    }
+
+    function closeModal() { document.getElementById("movieModal").classList.add("hidden"); }
+
+    document.getElementById("titleInput").addEventListener("input", e => {
+      const q = e.target.value.trim().toLowerCase();
+      document.getElementById("clearBtn").classList.toggle("hidden", !q);
+      const box = document.getElementById("suggestions");
+      if (!q) return box.classList.add("hidden");
+      const matches = allMovies.filter(m => m.title.toLowerCase().includes(q)).slice(0, 8);
+      if (!matches.length) return box.classList.add("hidden");
+      box.innerHTML = matches.map(m => `<button type="button" onclick="document.getElementById('titleInput').value='${m.title.replace(/'/g, "\\'")}';document.getElementById('suggestions').classList.add('hidden');renderMovies()" class="w-full text-left px-3.5 py-2.5 text-sm text-zinc-200 border-b border-white/5 flex justify-between"><span class="truncate">${m.title}</span><span class="text-xs text-zinc-400">${(m.screenings||[]).length} sale</span></button>`).join("");
+      box.classList.remove("hidden");
+      renderMovies();
+    });
+
+    loadMovies();
+  </script>
+</body>
+</html>
