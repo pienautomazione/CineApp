@@ -5,12 +5,12 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/f/f8/Dio_ride_%28film%29.png/960px-Dio_ride_%28film%29.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "posterUrl": "",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -113,40 +113,6 @@
           "20:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Trianon",
-        "zone": "Appio",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "20:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-          }
-        ],
-        "times": [
-          "20:10"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Sacher",
-        "zone": "Trastevere",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "20:45",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
-          }
-        ],
-        "times": [
-          "20:45"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
       }
     ]
   },
@@ -161,7 +127,7 @@
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -239,12 +205,12 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/GodzillaMinusZerologo.png/960px-GodzillaMinusZerologo.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "posterUrl": "",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -349,12 +315,12 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "posterUrl": "",
     "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -533,23 +499,6 @@
           "23:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Odeon",
-        "zone": "Trieste / Salario",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/BI/5609"
-          }
-        ],
-        "times": [
-          "21:00"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/BI/5609"
       }
     ]
   },
@@ -564,7 +513,7 @@
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -772,21 +721,11 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "20:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-          },
-          {
-            "time": "22:05",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-          },
-          {
             "time": "22:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
           }
         ],
         "times": [
-          "20:10",
-          "22:05",
           "22:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
@@ -865,12 +804,12 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://upload.wikimedia.org/wikipedia/it/f/ff/Estranea_Strippoli.jpeg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "posterUrl": "",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -941,12 +880,12 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/e/e5/Scrooge_e_gli_spiriti_del_Natale.png/960px-Scrooge_e_gli_spiriti_del_Natale.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "posterUrl": "",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1130,7 +1069,7 @@
   },
   {
     "id": 8,
-    "title": "Puan - Il Professore",
+    "title": "Se Domani Non Torno",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -1138,40 +1077,8 @@
     "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
-    "hasOV": true,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Azzurro Scipioni",
-        "zone": "Prati",
-        "isOV": true,
-        "language": "V.O. · Sub ITA",
-        "showtimes": [
-          {
-            "time": "21:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
-          }
-        ],
-        "times": [
-          "21:00"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
-      }
-    ]
-  },
-  {
-    "id": 9,
-    "title": "Se Domani Non Torno",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/3/3a/Se_domani_non_torno_%28film%29.png/960px-Se_domani_non_torno_%28film%29.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
-    "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1317,17 +1224,17 @@
     ]
   },
   {
-    "id": 10,
+    "id": 9,
     "title": "Come Rapinare Una Banca",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1383,17 +1290,17 @@
     ]
   },
   {
-    "id": 11,
+    "id": 10,
     "title": "La Ballata Del Re Delle Api",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "hasOV": true,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1459,17 +1366,17 @@
     ]
   },
   {
-    "id": 12,
+    "id": 11,
     "title": "Un Weekend Artificiale",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1562,17 +1469,17 @@
     ]
   },
   {
-    "id": 13,
+    "id": 12,
     "title": "Un Tranquillo Funerale Di Famiglia",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1616,17 +1523,17 @@
     ]
   },
   {
-    "id": 14,
+    "id": 13,
     "title": "Wild Horse Nine",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "hasOV": true,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1698,29 +1605,44 @@
           "23:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-      },
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Digger",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
       {
         "city": "Roma",
-        "cinema": "Reale",
-        "zone": "Trastevere",
+        "cinema": "Madison Cinemas",
+        "zone": "San Paolo",
         "isOV": false,
         "language": "Italiano",
         "showtimes": [
           {
             "time": "21:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/CT/5622"
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
           }
         ],
         "times": [
           "21:30"
         ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/CT/5622"
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
       }
     ]
   },
   {
     "id": 15,
-    "title": "Digger",
+    "title": "Wildwood - I Segreti Del Bosco P.",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -1729,7 +1651,7 @@
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1752,7 +1674,7 @@
   },
   {
     "id": 16,
-    "title": "Wildwood - I Segreti Del Bosco P.",
+    "title": "Sheep In The Box",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -1761,39 +1683,7 @@
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Madison Cinemas",
-        "zone": "San Paolo",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-          }
-        ],
-        "times": [
-          "21:30"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-      }
-    ]
-  },
-  {
-    "id": 17,
-    "title": "Sheep In The Box",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1815,17 +1705,17 @@
     ]
   },
   {
-    "id": 18,
+    "id": 17,
     "title": "Hunger Games: Sunrise On The R.",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "posterUrl": "",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": true,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1847,17 +1737,17 @@
     ]
   },
   {
-    "id": 19,
+    "id": 18,
     "title": "Xl) Hunger Games:L'Alba Sulla Mietitura",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1918,17 +1808,17 @@
     ]
   },
   {
-    "id": 20,
+    "id": 19,
     "title": "Clayface",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -1967,17 +1857,17 @@
     ]
   },
   {
-    "id": 21,
+    "id": 20,
     "title": "Hunger Games: L'Alba Sulla Miet. Imax",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
+    "posterUrl": "",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -2004,17 +1894,17 @@
     ]
   },
   {
-    "id": 22,
+    "id": 21,
     "title": "Hunger Games: L'Alba Sulla Miet. Isens",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "posterUrl": "",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
         "city": "Roma",
@@ -2049,38 +1939,6 @@
           "21:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
-      }
-    ]
-  },
-  {
-    "id": 23,
-    "title": "Look Back",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Dont_Look_Back_-_Bob_Dylan_%281967_film_poster%29.jpg/960px-Dont_Look_Back_-_Bob_Dylan_%281967_film_poster%29.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Mignon",
-        "zone": "Salario",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/MN/5512"
-          }
-        ],
-        "times": [
-          "21:00"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/MN/5512"
       }
     ]
   }
