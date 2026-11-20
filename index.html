@@ -104,7 +104,7 @@
       mTitle.textContent=m.title;mMeta.textContent=`${sc.length} sale disponibili oggi`;
       const p=await getPoster(m.title,m.posterUrl);
       if(p){mImg.src=p;mImg.classList.remove("hidden");mFb.classList.add("hidden");}else{mImg.classList.add("hidden");mFb.classList.remove("hidden");}
-      mList.innerHTML=sc.map(s=>`<div class="bg-white/5 border border-white/10 rounded-2xl p-3.5"><div class="flex justify-between mb-2"><span class="font-bold text-white">${s.cinema}</span><span class="text-xs text-sky-300">${s.isOV?'🌍 V.O. · Sub ITA':'🇮🇹 Italiano'}</span></div><div class="flex flex-wrap gap-2">${times(s).map(st=>`<a href="${st.url}" target="_blank" class="px-3 py-1.5 rounded-xl bg-amber-400 text-black text-xs font-extrabold">${st.time} · Prenota</a>`).join("")}</div></div>`).join("");
+      mList.innerHTML=sc.map(s=>`<div class="bg-white/5 border border-white/10 rounded-2xl p-3.5"><div class="flex justify-between mb-2"><span class="font-bold text-white">${s.cinema}</span><span class="text-xs text-sky-300">${s.isOV?'🌍 V.O. · Sub ITA':'🇮🇹 Italiano'}</span></div><div class="flex flex-wrap gap-2">${times(s).map(st=>`<a href="${st.url}" target="_blank" class="px-3 py-1.5 rounded-xl bg-amber-400 text-black text-xs font-extrabold">Vai alla sala · ${st.time}</a>`).join("")}</div></div>`).join("");
       modal.classList.remove("hidden");
     }
     function closeModal(){modal.classList.add("hidden");}
