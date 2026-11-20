@@ -52,6 +52,29 @@ JS_GET_CINEMA_CARDS = r"""
 }
 """
 
+# Cattura ogni immagine locandina visibile nella pagina del cinema associandola al testo della card
+JS_GET_DOM_POSTERS = r"""
+() => {
+    const posters = [];
+    document.querySelectorAll('img').forEach(img => {
+        const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
+        if (!src || !src.startsWith('http') || /logo|icon|flag|placeholder|avatar|sprite/i.test(src)) return;
+        if (img.naturalWidth > 0 && img.naturalWidth < 45) return;
+
+        let box = img.parentElement;
+        for (let i = 0; i < 4 && box; i++) {
+            const text = (box.innerText || '').trim();
+            if (text.length >= 3 && text.length <= 300) {
+                posters.push({ text: text.toLowerCase(), src });
+                break;
+            }
+            box = box.parentElement;
+        }
+    });
+    return posters;
+}
+"""
+
 def dismiss_cookies(page):
     try:
         page.evaluate("""() => {
@@ -64,6 +87,8 @@ def fetch_hd_poster(title: str) -> str:
     if title in POSTER_CACHE:
         return POSTER_CACHE[title]
     search_term = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", title).strip()
+
+    # 1. iTunes Store IT / US
     for country in ["it", "us"]:
         try:
             r = requests.get(
@@ -83,6 +108,33 @@ def fetch_hd_poster(title: str) -> str:
                             return hd_art
         except Exception:
             pass
+
+    # 2. Wikipedia IT (ottimo per uscite italiane recentissime in sala)
+    try:
+        r = requests.get(
+            "https://it.wikipedia.org/w/api.php",
+            params={
+                "action": "query",
+                "generator": "search",
+                "gsrsearch": f"{search_term} film",
+                "gsrlimit": 2,
+                "prop": "pageimages",
+                "pithumbsize": 600,
+                "format": "json"
+            },
+            headers={"User-Agent": "CineApp/1.0"},
+            timeout=5
+        )
+        if r.status_code == 200:
+            pages = r.json().get("query", {}).get("pages", {})
+            for p_data in pages.values():
+                thumb = p_data.get("thumbnail", {}).get("source", "")
+                if thumb and thumb.startswith("http"):
+                    POSTER_CACHE[title] = thumb
+                    return thumb
+    except Exception:
+        pass
+
     POSTER_CACHE[title] = ""
     return ""
 
@@ -114,8 +166,23 @@ def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", cleaned)
     return " ".join(cleaned.split()).strip().title()
 
+def find_image_in_obj(obj) -> str:
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, str) and v.strip():
+                kl = k.lower()
+                if any(w in kl for w in ["poster", "image", "img", "locandina", "cover", "thumb", "picture", "photo"]):
+                    if v.startswith("http") and not re.search(r"logo|icon|flag|placeholder|avatar|sprite", v, flags=re.I):
+                        return v.strip()
+                    if v.startswith("/") and len(v) > 5:
+                        return f"https://www.webtic.it{v.strip()}"
+    raw = json.dumps(obj)
+    m_abs = re.search(r"https?://[^\"'\s]+\.(?:jpg|jpeg|png|webp)(?:\?[^\"'\s]*)?", raw, flags=re.I)
+    if m_abs and not re.search(r"logo|icon|flag|placeholder|avatar|sprite", m_abs.group(0), flags=re.I):
+        return m_abs.group(0)
+    return ""
+
 def parse_webtic_json(data, today_iso: str, base_cinema_url: str, results: list):
-    """Estrae dal JSON API di Webtic titolo, locandina, URL diretto evento e orari tondi di oggi."""
     if isinstance(data, dict):
         title = ""
         for k in ["Title", "title", "EventName", "eventName", "MovieTitle", "movieTitle", "Descrizione", "descrizione"]:
@@ -125,26 +192,26 @@ def parse_webtic_json(data, today_iso: str, base_cinema_url: str, results: list)
                 break
 
         if title:
-            poster = ""
-            for pk in ["Poster", "poster", "Image", "image", "ImageUrl", "imageUrl", "Locandina", "locandina", "Picture", "Thumb", "thumb", "Cover", "cover"]:
-                pval = data.get(pk)
-                if isinstance(pval, str) and pval.startswith("http"):
-                    poster = pval
+            poster = find_image_in_obj(data)
+
+            ev_code = ""
+            for idk in ["EventId", "eventId", "EventCode", "eventCode", "Code", "code", "Id", "id", "IdEvento", "idEvento"]:
+                v = data.get(idk)
+                if isinstance(v, (int, str)) and str(v).strip() and len(str(v).strip()) >= 2:
+                    ev_code = str(v).strip()
                     break
 
-            event_id = data.get("EventId") or data.get("eventId") or data.get("Id") or data.get("id")
             direct_url = base_cinema_url
-            if event_id and "/local/" in base_cinema_url:
+            if ev_code and "/local/" in base_cinema_url:
                 clean_base = base_cinema_url.split("?")[0].rstrip("/")
                 if "/event/" not in clean_base:
-                    direct_url = f"{clean_base}/event/{event_id}"
+                    direct_url = f"{clean_base}/event/{ev_code}"
 
             raw_str = json.dumps(data)
-            # Cerca orari associati alla data odierna (YYYY-MM-DDTHH:MM) con minuti multipli di 5
             today_times = re.findall(rf"{today_iso}[T\s]+([12]\d):([0-5][05])", raw_str)
             if today_times:
                 showtimes = [{"time": f"{h}:{m}", "url": direct_url} for h, m in sorted(set(today_times))]
-                results.append({"title": title, "poster": poster, "showtimes": showtimes, "url": direct_url})
+                results.append({"rawTitle": title, "poster": poster, "showtimes": showtimes, "url": direct_url})
 
         for v in data.values():
             parse_webtic_json(v, today_iso, base_cinema_url, results)
@@ -154,7 +221,7 @@ def parse_webtic_json(data, today_iso: str, base_cinema_url: str, results: list)
 
 def scrape_all_rome():
     today_iso = datetime.now().strftime("%Y-%m-%d")
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta JSON API cinema Roma per {today_iso}...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta cinema Roma per {today_iso}...")
     movies_dict = {}
     counter = 1
 
@@ -320,13 +387,37 @@ def scrape_all_rome():
 
                 page.remove_listener("response", on_resp)
 
+                # Raccoglie tutte le locandine <img> presenti nel DOM di questa sala
+                dom_posters = page.evaluate(JS_GET_DOM_POSTERS)
+
                 extracted = []
                 for payload in raw_payloads:
                     parse_webtic_json(payload, today_iso, cinema_url, extracted)
 
-                print(f"→ {cinema_name}: {len(extracted)} film con orari oggi")
                 for it in extracted:
-                    add_screening(it["title"], cinema_name, it["showtimes"], it["url"], it["poster"])
+                    if not it["poster"]:
+                        t_low = normalize_title(it["rawTitle"]).lower()
+                        match_p = next((dp["src"] for dp in dom_posters if t_low in dp["text"]), "")
+                        if match_p:
+                            it["poster"] = match_p
+
+                    try:
+                        ev_el = page.get_by_text(it["rawTitle"], exact=False).first
+                        if ev_el.is_visible(timeout=500):
+                            ev_el.click(force=True, timeout=2000)
+                            page.wait_for_timeout(1200)
+                            if page.url != cinema_url and "/local/" in page.url:
+                                it["url"] = page.url
+                                for st in it["showtimes"]:
+                                    st["url"] = page.url
+                                page.go_back(timeout=4000)
+                                page.wait_for_timeout(1000)
+                    except Exception:
+                        pass
+
+                print(f"→ {cinema_name}: {len(extracted)} film (locandine: {sum(1 for x in extracted if x['poster'])})")
+                for it in extracted:
+                    add_screening(it["rawTitle"], cinema_name, it["showtimes"], it["url"], it["poster"])
 
             except Exception as e:
                 print(f"  Salto {cinema_name}: {str(e)[:80]}")
