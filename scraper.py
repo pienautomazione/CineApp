@@ -31,7 +31,6 @@ GRADIENTS = [
 
 POSTER_CACHE = {}
 
-# Estrae SOLO i nomi dei cinema (ignora righe indirizzo con virgole o cap)
 JS_GET_CINEMA_CARDS = r"""
 () => {
     const names = [];
@@ -42,7 +41,6 @@ JS_GET_CINEMA_CARDS = r"""
         if (el.children.length > 2) return;
         const txt = (el.innerText || '').trim().split('\n')[0].trim();
         if (txt.length < 4 || txt.length > 50) return;
-        // Esclude righe indirizzo (es. "Roma Parco, Magliana" o indirizzi con via/piazza/cap)
         if (txt.includes(',') || /\b(via|viale|piazza|corso|largo|piazzale|lido)\b/i.test(txt)) return;
         if (ignore.test(txt) || /crea informatica|cookie|privacy/i.test(txt)) return;
         if (!seen.has(txt.toLowerCase())) {
@@ -51,62 +49,6 @@ JS_GET_CINEMA_CARDS = r"""
         }
     });
     return names;
-}
-"""
-
-# Nella pagina del cinema, ogni film ha una locandina <img> accanto al titolo
-JS_LIST_TODAY_EVENTS = r"""
-(cinemaName) => {
-    const events = [];
-    const seen = new Set();
-    const cLow = cinemaName.toLowerCase();
-
-    document.querySelectorAll('img').forEach(img => {
-        const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
-        if (!src || !src.startsWith('http') || /logo|icon|flag|placeholder|avatar|sprite|banner/i.test(src)) return;
-
-        // Risale al contenitore della card film (2-4 livelli)
-        let card = img.parentElement;
-        for (let i = 0; i < 4 && card; i++) {
-            const lines = (card.innerText || '').split('\n').map(l => l.trim()).filter(l => l.length >= 3 && l.length <= 75);
-            // Filtra righe che non siano genere, anno (1971/2026), data (14 dic 2026) o nome cinema
-            const candidateTitle = lines.find(l =>
-                !l.toLowerCase().includes(cLow) &&
-                !/^(19\d\d|20\d\d)$/.test(l) &&
-                !/^\d{1,2}\s+(gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)/i.test(l) &&
-                !/^(avventura|azione|commedia|drammatico|fantascienza|horror|thriller|animazione|documentario|crime|biografico|storico|musical|sentimentale)/i.test(l) &&
-                !/^(tutti|oggi|indietro|eventi in programmazione|acquista|prenota)/i.test(l)
-            );
-
-            if (candidateTitle && !seen.has(candidateTitle.toLowerCase())) {
-                seen.add(candidateTitle.toLowerCase());
-                events.push({ rawTitle: candidateTitle, poster: src });
-                break;
-            }
-            card = card.parentElement;
-        }
-    });
-    return events;
-}
-"""
-
-JS_EXTRACT_EVENT_SHOWTIMES = r"""
-(eventUrl) => {
-    // Solo orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:00, 18:15, 20:30, 22:45)
-    const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
-    const timesSet = new Set();
-
-    document.querySelectorAll('button, a, span, div').forEach(el => {
-        if (el.children.length === 0) {
-            const txt = (el.innerText || '').trim();
-            if (validShowtimeRegex.test(txt)) {
-                timesSet.add(txt);
-            }
-        }
-    });
-
-    const showtimes = Array.from(timesSet).sort().map(t => ({ time: t, url: eventUrl }));
-    return showtimes;
 }
 """
 
@@ -172,8 +114,47 @@ def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", cleaned)
     return " ".join(cleaned.split()).strip().title()
 
+def parse_webtic_json(data, today_iso: str, base_cinema_url: str, results: list):
+    """Estrae dal JSON API di Webtic titolo, locandina, URL diretto evento e orari tondi di oggi."""
+    if isinstance(data, dict):
+        title = ""
+        for k in ["Title", "title", "EventName", "eventName", "MovieTitle", "movieTitle", "Descrizione", "descrizione"]:
+            val = data.get(k)
+            if isinstance(val, str) and 2 <= len(val.strip()) <= 80:
+                title = val.strip()
+                break
+
+        if title:
+            poster = ""
+            for pk in ["Poster", "poster", "Image", "image", "ImageUrl", "imageUrl", "Locandina", "locandina", "Picture", "Thumb", "thumb", "Cover", "cover"]:
+                pval = data.get(pk)
+                if isinstance(pval, str) and pval.startswith("http"):
+                    poster = pval
+                    break
+
+            event_id = data.get("EventId") or data.get("eventId") or data.get("Id") or data.get("id")
+            direct_url = base_cinema_url
+            if event_id and "/local/" in base_cinema_url:
+                clean_base = base_cinema_url.split("?")[0].rstrip("/")
+                if "/event/" not in clean_base:
+                    direct_url = f"{clean_base}/event/{event_id}"
+
+            raw_str = json.dumps(data)
+            # Cerca orari associati alla data odierna (YYYY-MM-DDTHH:MM) con minuti multipli di 5
+            today_times = re.findall(rf"{today_iso}[T\s]+([12]\d):([0-5][05])", raw_str)
+            if today_times:
+                showtimes = [{"time": f"{h}:{m}", "url": direct_url} for h, m in sorted(set(today_times))]
+                results.append({"title": title, "poster": poster, "showtimes": showtimes, "url": direct_url})
+
+        for v in data.values():
+            parse_webtic_json(v, today_iso, base_cinema_url, results)
+    elif isinstance(data, list):
+        for item in data:
+            parse_webtic_json(item, today_iso, base_cinema_url, results)
+
 def scrape_all_rome():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta cinema Roma (Tab 'Oggi' + locandine + deep-link)...")
+    today_iso = datetime.now().strftime("%Y-%m-%d")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta JSON API cinema Roma per {today_iso}...")
     movies_dict = {}
     counter = 1
 
@@ -298,7 +279,7 @@ def scrape_all_rome():
             try:
                 if page.url != rome_list_url:
                     page.goto(rome_list_url, wait_until="domcontentloaded", timeout=15000)
-                    page.wait_for_timeout(2200)
+                    page.wait_for_timeout(2000)
                     dismiss_cookies(page)
 
                 for p_idx in range(1, target_page):
@@ -318,49 +299,34 @@ def scrape_all_rome():
                 if not cinema_el.is_visible(timeout=800):
                     continue
 
+                raw_payloads = []
+                def on_resp(resp):
+                    try:
+                        if "json" in resp.headers.get("content-type", "") and resp.status == 200:
+                            raw_payloads.append(resp.json())
+                    except Exception:
+                        pass
+
+                page.on("response", on_resp)
                 cinema_el.click(force=True, timeout=5000)
-                page.wait_for_timeout(2800)
+                page.wait_for_timeout(2600)
                 dismiss_cookies(page)
                 cinema_url = page.url
 
-                # Clicca su "Oggi" e attende il caricamento delle card film
                 oggi_btn = page.get_by_text("Oggi", exact=True).first
-                if oggi_btn.is_visible(timeout=1200):
-                    oggi_btn.click(force=True, timeout=3000)
-                    page.wait_for_timeout(2200)
+                if oggi_btn.is_visible(timeout=1000):
+                    oggi_btn.click(force=True, timeout=2500)
+                    page.wait_for_timeout(1800)
 
-                for _ in range(4):
-                    page.mouse.wheel(0, 1000)
-                    page.wait_for_timeout(250)
+                page.remove_listener("response", on_resp)
 
-                today_events = page.evaluate(JS_LIST_TODAY_EVENTS, normalize_cinema_name(cinema_name))
-                print(f"→ {cinema_name}: {len(today_events)} film Oggi")
+                extracted = []
+                for payload in raw_payloads:
+                    parse_webtic_json(payload, today_iso, cinema_url, extracted)
 
-                for ev in today_events:
-                    try:
-                        if page.url != cinema_url:
-                            page.goto(cinema_url, wait_until="domcontentloaded", timeout=12000)
-                            page.wait_for_timeout(2000)
-                            dismiss_cookies(page)
-                            ob = page.get_by_text("Oggi", exact=True).first
-                            if ob.is_visible(timeout=800):
-                                ob.click(force=True, timeout=2000)
-                                page.wait_for_timeout(1500)
-
-                        ev_el = page.get_by_text(ev["rawTitle"], exact=True).first
-                        if not ev_el.is_visible(timeout=800):
-                            ev_el = page.get_by_text(ev["rawTitle"], exact=False).first
-                        if not ev_el.is_visible(timeout=800):
-                            continue
-
-                        ev_el.click(force=True, timeout=4000)
-                        page.wait_for_timeout(2000)
-                        direct_event_url = page.url
-
-                        showtimes = page.evaluate(JS_EXTRACT_EVENT_SHOWTIMES, direct_event_url)
-                        add_screening(ev["rawTitle"], cinema_name, showtimes, direct_event_url, ev["poster"])
-                    except Exception:
-                        continue
+                print(f"→ {cinema_name}: {len(extracted)} film con orari oggi")
+                for it in extracted:
+                    add_screening(it["title"], cinema_name, it["showtimes"], it["url"], it["poster"])
 
             except Exception as e:
                 print(f"  Salto {cinema_name}: {str(e)[:80]}")
