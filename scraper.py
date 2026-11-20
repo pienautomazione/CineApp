@@ -17,7 +17,7 @@ ROME_ZONES = {
     "broadway": "Prenestina", "tibur": "San Lorenzo", "andromeda": "Termini",
     "caravaggio": "Parioli", "maestoso": "Appia", "parco de' medici": "Magliana",
     "moderno": "Repubblica", "porta di roma": "Bufalotta", "roma est": "Lunghezza",
-    "cineferonia": "Fiano Romano"
+    "romaest": "Lunghezza", "maximo": "Laurentina", "cineferonia": "Fiano Romano"
 }
 
 GRADIENTS = [
@@ -34,12 +34,12 @@ JS_GET_CINEMA_CARDS = r"""
 () => {
     const names = [];
     const seen = new Set();
-    const ignore = /^(salta al|eventi|locali|magazine|chi siamo|privacy|scegli il locale|cerca eventi|provincia|roma|tutta italia|crea informatica|accedi|carrello|tutti|oggi|\d+)$/i;
+    const ignore = /^(salta al|eventi|locali|magazine|chi siamo|privacy|scegli il locale|cerca eventi|provincia|roma|tutta italia|crea informatica|accedi|carrello|tutti|oggi|cookie|\d+)$/i;
 
     document.querySelectorAll('h1, h2, h3, h4, h5, strong, [class*="title"], [class*="name"], [class*="local"]').forEach(el => {
         if (el.children.length > 2) return;
         const txt = (el.innerText || '').trim().split('\n')[0].trim();
-        if (txt.length >= 4 && txt.length <= 55 && !ignore.test(txt) && !seen.has(txt.toLowerCase())) {
+        if (txt.length >= 4 && txt.length <= 55 && !ignore.test(txt) && !/crea informatica|cookie|privacy/i.test(txt) && !seen.has(txt.toLowerCase())) {
             seen.add(txt.toLowerCase());
             names.push(txt);
         }
@@ -56,13 +56,12 @@ JS_LIST_TODAY_EVENTS = r"""
 
     document.querySelectorAll('h1, h2, h3, h4, strong, [class*="title"], [class*="titolo"]').forEach(el => {
         const rawTitle = (el.innerText || '').trim().split('\n')[0].trim();
-        if (rawTitle.length < 3 || rawTitle.length > 75 || ignore.test(rawTitle)) return;
+        if (rawTitle.length < 3 || rawTitle.length > 75 || ignore.test(rawTitle) || /crea informatica|cookie|privacy/i.test(rawTitle)) return;
         if (seen.has(rawTitle.toLowerCase())) return;
 
-        // Cerca immagine locandina nella riga/card dell'evento
         let poster = '';
         let box = el.parentElement;
-        for (let i = 0; i < 4 && box; i++) {
+        for (let i = 0; i < 5 && box; i++) {
             const img = box.querySelector('img');
             if (img) {
                 const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
@@ -83,7 +82,6 @@ JS_LIST_TODAY_EVENTS = r"""
 
 JS_EXTRACT_EVENT_SHOWTIMES = r"""
 (eventUrl) => {
-    // Accetta SOLO orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:00, 18:15, 20:30, 22:45)
     const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
     const timesSet = new Set();
 
@@ -110,6 +108,14 @@ JS_EXTRACT_EVENT_SHOWTIMES = r"""
     return { showtimes, poster };
 }
 """
+
+def dismiss_cookies(page):
+    try:
+        page.evaluate("""() => {
+            document.querySelectorAll('[class*="cookie"], [id*="cookie"], .cdk-overlay-backdrop').forEach(el => el.remove());
+        }""")
+    except Exception:
+        pass
 
 def fetch_hd_poster(title: str) -> str:
     if title in POSTER_CACHE:
@@ -244,15 +250,8 @@ def scrape_all_rome():
 
         rome_list_url = "https://www.webtic.it/app/main/all-locals/RM"
         page.goto(rome_list_url, wait_until="domcontentloaded", timeout=25000)
-        page.wait_for_timeout(3000)
-
-        for btn_text in ["Accetta", "Accetto", "Accept"]:
-            try:
-                btn = page.get_by_text(btn_text, exact=False).first
-                if btn.is_visible(timeout=400):
-                    btn.click(timeout=400)
-            except Exception:
-                pass
+        page.wait_for_timeout(2500)
+        dismiss_cookies(page)
 
         excluded_towns = [
             "santa marinella", "civitavecchia", "velletri", "tivoli", "frascati",
@@ -265,7 +264,7 @@ def scrape_all_rome():
         for page_num in range(1, 8):
             for _ in range(4):
                 page.mouse.wheel(0, 1200)
-                page.wait_for_timeout(250)
+                page.wait_for_timeout(200)
 
             cards = page.evaluate(JS_GET_CINEMA_CARDS)
             for name in cards:
@@ -281,9 +280,9 @@ def scrape_all_rome():
             for selector in [f"button:has-text('{page_num + 1}')", f"a:has-text('{page_num + 1}')", "[aria-label*='Next']", "[aria-label*='Successiv']"]:
                 try:
                     btn = page.locator(selector).first
-                    if btn.is_visible(timeout=500) and btn.is_enabled():
-                        btn.click()
-                        page.wait_for_timeout(2000)
+                    if btn.is_visible(timeout=400) and btn.is_enabled():
+                        btn.click(force=True)
+                        page.wait_for_timeout(1800)
                         next_clicked = True
                         break
                 except Exception:
@@ -291,66 +290,70 @@ def scrape_all_rome():
             if not next_clicked:
                 break
 
-        print(f"Trovati {len(all_cinema_names)} cinema unici a Roma: {[c[1] for c in all_cinema_names]}")
+        print(f"Trovati {len(all_cinema_names)} cinema unici a Roma.")
 
         for target_page, cinema_name in all_cinema_names:
             try:
                 if page.url != rome_list_url:
-                    page.goto(rome_list_url, wait_until="domcontentloaded", timeout=20000)
-                    page.wait_for_timeout(2000)
+                    page.goto(rome_list_url, wait_until="domcontentloaded", timeout=15000)
+                    page.wait_for_timeout(1800)
+                    dismiss_cookies(page)
 
                 for p_idx in range(1, target_page):
                     for selector in [f"button:has-text('{p_idx + 1}')", f"a:has-text('{p_idx + 1}')", "[aria-label*='Next']"]:
                         try:
                             btn = page.locator(selector).first
-                            if btn.is_visible(timeout=500):
-                                btn.click()
-                                page.wait_for_timeout(1500)
+                            if btn.is_visible(timeout=400):
+                                btn.click(force=True)
+                                page.wait_for_timeout(1200)
                                 break
                         except Exception:
                             pass
 
                 cinema_el = page.get_by_text(cinema_name, exact=True).first
-                if not cinema_el.is_visible(timeout=1200):
+                if not cinema_el.is_visible(timeout=800):
                     cinema_el = page.get_by_text(cinema_name, exact=False).first
-                if not cinema_el.is_visible(timeout=1200):
+                if not cinema_el.is_visible(timeout=800):
                     continue
 
-                cinema_el.click()
-                page.wait_for_timeout(2800)
+                cinema_el.click(force=True, timeout=5000)
+                page.wait_for_timeout(2200)
+                dismiss_cookies(page)
                 cinema_url = page.url
 
-                # 1. Clicca obbligatoriamente sulla tab "Oggi" per escludere gli eventi futuri ("Tutti")
+                # Clicca sulla tab "Oggi" e scorre tutta la lista dei film del giorno
                 oggi_btn = page.get_by_text("Oggi", exact=True).first
-                if oggi_btn.is_visible(timeout=1200):
-                    oggi_btn.click()
+                if oggi_btn.is_visible(timeout=1000):
+                    oggi_btn.click(force=True, timeout=3000)
                     page.wait_for_timeout(1800)
 
-                # 2. Legge l'elenco dei film in programmazione Oggi con la loro locandina
+                for _ in range(4):
+                    page.mouse.wheel(0, 1000)
+                    page.wait_for_timeout(250)
+
                 today_events = page.evaluate(JS_LIST_TODAY_EVENTS)
-                # Esclude il nome stesso del cinema dalla lista titoli
                 today_events = [e for e in today_events if normalize_cinema_name(e["rawTitle"]).lower() != normalize_cinema_name(cinema_name).lower()]
                 print(f"→ {cinema_name}: {len(today_events)} film Oggi")
 
-                # 3. Entra in ciascun singolo film per prendere l'URL diretto dell'evento e i suoi orari
                 for ev in today_events:
                     try:
                         if page.url != cinema_url:
-                            page.goto(cinema_url, wait_until="domcontentloaded", timeout=15000)
-                            page.wait_for_timeout(1800)
+                            page.goto(cinema_url, wait_until="domcontentloaded", timeout=12000)
+                            page.wait_for_timeout(1500)
+                            dismiss_cookies(page)
                             ob = page.get_by_text("Oggi", exact=True).first
-                            if ob.is_visible(timeout=800):
-                                ob.click()
+                            if ob.is_visible(timeout=600):
+                                ob.click(force=True, timeout=2000)
                                 page.wait_for_timeout(1200)
 
                         ev_el = page.get_by_text(ev["rawTitle"], exact=True).first
-                        if not ev_el.is_visible(timeout=800):
+                        if not ev_el.is_visible(timeout=600):
                             ev_el = page.get_by_text(ev["rawTitle"], exact=False).first
-                        if not ev_el.is_visible(timeout=800):
+                        if not ev_el.is_visible(timeout=600):
                             continue
 
-                        ev_el.click()
-                        page.wait_for_timeout(2200)
+                        ev_el.click(force=True, timeout=4000)
+                        page.wait_for_timeout(1800)
                         direct_event_url = page.url
 
                         details = page.evaluate(JS_EXTRACT_EVENT_SHOWTIMES, direct_event_url)
@@ -360,7 +363,7 @@ def scrape_all_rome():
                         continue
 
             except Exception as e:
-                print(f"  Errore su {cinema_name}: {e}")
+                print(f"  Salto {cinema_name}: {str(e)[:80]}")
 
         browser.close()
 
