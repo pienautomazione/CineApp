@@ -84,30 +84,26 @@ def run():
                     page.wait_for_timeout(1500)
                 page.remove_listener("response", fn)
 
-                # Cattura locandine reali Webtic dal DOM renderizzato
-                dom_imgs = page.evaluate("""() => [...document.querySelectorAll('img')].map(i=>({src:i.currentSrc||i.src||'',txt:(i.parentElement?.parentElement?.innerText||'').toLowerCase()})).filter(x=>x.src.startsWith('http')&&!/logo|icon|flag|sprite/i.test(x.src))""")
+                dom_imgs = page.evaluate("""() => {
+                    const out = [];
+                    document.querySelectorAll('img').forEach(i => {
+                        const src = i.currentSrc || i.src || '';
+                        if (!src.startsWith('http') || /logo|icon|flag|sprite/i.test(src)) return;
+                        let box = i;
+                        for (let k = 0; k < 4 && box.parentElement; k++) box = box.parentElement;
+                        out.push({ src, txt: (box.innerText || '').toLowerCase() });
+                    });
+                    return out;
+                }""")
+
                 ext = []
                 for pl in payloads: parse_json(pl, today, c_url, ext)
                 for it in ext:
                     nt_low = norm_title(it["raw"]).lower()
                     hit_img = next((d["src"] for d in dom_imgs if nt_low in d["txt"]), "")
                     if hit_img: it["poster"] = hit_img
-                    try:
-                        if page.url != c_url:
-                            page.goto(c_url, wait_until="domcontentloaded", timeout=10000)
-                            page.wait_for_timeout(1400)
-                        ev_loc = page.get_by_text(it["raw"], exact=False).first
-                        if not ev_loc.is_visible(timeout=600):
-                            ev_loc = page.get_by_text(norm_title(it["raw"]), exact=False).first
-                        if ev_loc.is_visible(timeout=600):
-                            ev_loc.click(timeout=2500)
-                            page.wait_for_timeout(1800)
-                            if page.url != c_url and "all-locals" not in page.url:
-                                it["url"] = page.url
-                                for s in it["st"]: s["url"] = page.url
-                    except Exception: pass
 
-                print(f"→ {cname}: {len(ext)} film (img:{sum(1 for x in ext if x['poster'])}, link:{sum(1 for x in ext if x['url']!=c_url)})")
+                print(f"→ {cname}: {len(ext)} film (locandine: {sum(1 for x in ext if x['poster'])})")
                 for it in ext:
                     ov, nt, nc = is_ov(it["raw"]), norm_title(it["raw"]), norm_cinema(cname)
                     if len(nt) < 3: continue
@@ -122,8 +118,7 @@ def run():
                         movies[nt]["screenings"].append({"city": "Roma", "cinema": nc, "zone": get_zone(nc), "isOV": ov, "language": "V.O. · Sub ITA" if ov else "Italiano", "showtimes": it["st"], "times": [x["time"] for x in it["st"]], "bookingUrl": it["url"]})
                     else:
                         m = {x["time"]: x["url"] for x in sc["showtimes"]}
-                        for x in it["st"]:
-                            if x["time"] not in m or m[x["time"]] == c_url: m[x["time"]] = x["url"]
+                        for x in it["st"]: m[x["time"]] = x["url"]
                         sc["showtimes"] = [{"time": k, "url": v} for k, v in sorted(m.items())]
                         sc["times"] = [x["time"] for x in sc["showtimes"]]
             except Exception: pass
