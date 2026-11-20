@@ -38,10 +38,8 @@ def is_ov(raw):
     return bool(re.search(r"(?:\bO\.?V\.?\b|\bV\.?O\.?S?\.?\b|SUB\s*ITA|VERSIONE\s*ORIGINALE)", raw, re.I))
 
 def norm_title(raw):
-    c = re.sub(r"^\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|EVENTO|SUB\s*ITA)[\)\]]\s*", "", raw, flags=re.I)
-    c = re.sub(r"\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB\s*ITA|VM\d+|EVENTO|\bIT\b)[\)\]]", "", c, flags=re.I)
-    c = re.sub(r"\b(?:O\.?V\.?|V\.?O\.?S?\.?|SUB\s*ITA)\b\s*$", "", c, flags=re.I)
-    return " ".join(re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", c).split()).strip().title()
+    c = re.sub(r"^\s*[\(\[](?:O\.?V\.?\vert{}V\.?O\.?S?\.?\vert{}2D\vert{}3D\vert{}EVENTO\vert{}SUB\s*ITA)[\)\]]\s*", "", raw, flags=re.I)
+    c = re.sub(r"\s*[\(\[](?:O\.?V\.?\vert{}V\.?O\.?S?\.?\vert{}2D\vert{}3D\vert{}DOLBY ATMOS\vert{}SUB\s*ITA\vert{}VM\d+\vert{}EVENTO\vert{}\bIT\b)[\)\]]", "", c, flags=re.I) c = re.sub(r"\b(?:O\.?V\.?\vert{}V\.?O\.?S?\.?\vert{}SUB\s*ITA)\b\s*$", "", c, flags=re.I) return " ".join(re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", c).split()).strip().title()
 
 def find_img(obj):
     raw = json.dumps(obj)
@@ -67,120 +65,4 @@ def parse_json(data, today, base_url, out):
 def run():
     today = datetime.now().strftime("%Y-%m-%d")
     movies, idx = {}, 1
-    excl = ["santa marinella","civitavecchia","velletri","tivoli","frascati","albano","anzio","nettuno","pomezia","guidonia","colleferro","bracciano","fiumicino","monterotondo","palestrina","ladispoli","grottaferrata","trevignano","ostia","parco leonardo"]
-
-    with sync_playwright() as p:
-        b = p.chromium.launch(headless=True, args=["--disable-http2","--no-sandbox"])
-        page = b.new_page(viewport={"width": 1280, "height": 900}, locale="it-IT")
-        list_url = "https://www.webtic.it/app/main/all-locals/RM"
-        page.goto(list_url, wait_until="domcontentloaded", timeout=25000)
-        page.wait_for_timeout(2500)
-        page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"],.cdk-overlay-backdrop').forEach(e=>e.remove())")
-
-        cinemas, seen = [], set()
-        for pg in range(1, 8):
-            page.mouse.wheel(0, 3000)
-            page.wait_for_timeout(500)
-            names = page.evaluate("""() => [...document.querySelectorAll('h1,h2,h3,h4,h5,strong,[class*="title"],[class*="name"]')].map(e=>(e.innerText||'').trim().split('\\n')[0].trim()).filter(t=>t.length>=4&&t.length<=50&&!t.includes(',')&&!/crea informatica|cookie|privacy|eventi|locali|provincia|tutta italia/i.test(t))""")
-            for n in names:
-                if not any(x in n.lower() for x in excl) and norm_cinema(n).lower() not in seen:
-                    seen.add(norm_cinema(n).lower())
-                    cinemas.append((pg, n))
-            nxt = page.locator(f"button:has-text('{pg+1}'), a:has-text('{pg+1}')").first
-            if nxt.is_visible(timeout=400):
-                nxt.click(force=True)
-                page.wait_for_timeout(1500)
-            else:
-                break
-
-        print(f"Cinema trovati: {len(cinemas)}")
-        for pg, cname in cinemas:
-            try:
-                if page.url != list_url:
-                    page.goto(list_url, wait_until="domcontentloaded", timeout=15000)
-                    page.wait_for_timeout(1500)
-                    page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"]').forEach(e=>e.remove())")
-                for p_i in range(1, pg):
-                    b_pg = page.locator(f"button:has-text('{p_i+1}'), a:has-text('{p_i+1}')").first
-                    if b_pg.is_visible(timeout=400):
-                        b_pg.click(force=True)
-                        page.wait_for_timeout(1000)
-
-                el = page.get_by_text(cname, exact=False).first
-                if not el.is_visible(timeout=700): continue
-                payloads = []
-                fn = lambda r: payloads.append(r.json()) if ("json" in r.headers.get("content-type","") and r.status==200) else None
-                page.on("response", fn)
-                el.click(force=True, timeout=4000)
-                page.wait_for_timeout(2200)
-                c_url = page.url
-                oggi = page.get_by_text("Oggi", exact=True).first
-                if oggi.is_visible(timeout=800):
-                    oggi.click(force=True, timeout=2000)
-                    page.wait_for_timeout(1500)
-                page.remove_listener("response", fn)
-
-                ext = []
-                for pl in payloads: parse_json(pl, today, c_url, ext)
-
-                # Naviga dentro ciascun film per catturare il suo URL diretto (qualsiasi rotta usi Webtic)
-                for it in ext:
-                    try:
-                        if page.url != c_url:
-                            page.goto(c_url, wait_until="domcontentloaded", timeout=10000)
-                            page.wait_for_timeout(1400)
-                            ob = page.get_by_text("Oggi", exact=True).first
-                            if ob.is_visible(timeout=600):
-                                ob.click(force=True, timeout=1500)
-                                page.wait_for_timeout(1000)
-
-                        # Cerca il titolo esatto o normalizzato nella lista film della pagina
-                        target_title = norm_title(it["raw"])
-                        ev = page.get_by_text(it["raw"], exact=False).first
-                        if not ev.is_visible(timeout=700):
-                            ev = page.get_by_text(target_title, exact=False).first
-
-                        if ev.is_visible(timeout=700):
-                            ev.scroll_into_view_if_needed(timeout=1500)
-                            ev.click(force=True, timeout=2500)
-                            page.wait_for_timeout(1600)
-                            if page.url != c_url and "all-locals" not in page.url:
-                                it["url"] = page.url
-                                for s in it["st"]:
-                                    s["url"] = page.url
-                    except Exception:
-                        pass
-
-                deep_count = sum(1 for x in ext if x["url"] != c_url)
-                print(f"→ {cname}: {len(ext)} film (deep-link diretti: {deep_count})")
-                for it in ext:
-                    ov, nt, nc = is_ov(it["raw"]), norm_title(it["raw"]), norm_cinema(cname)
-                    if len(nt) < 3: continue
-                    if nt not in movies:
-                        g, a = GRADS[(idx-1) % len(GRADS)]
-                        movies[nt] = {"id": idx, "title": nt, "genre": "In Sala · Oggi", "duration": "Oggi", "rating": "★", "posterUrl": it["poster"], "gradient": g, "accent": a, "tag": "ROMA", "hasOV": ov, "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.", "screenings": []}
-                        idx += 1
-                    elif not movies[nt]["posterUrl"] and it["poster"]:
-                        movies[nt]["posterUrl"] = it["poster"]
-                    sc = next((s for s in movies[nt]["screenings"] if s["cinema"].lower()==nc.lower() and s["isOV"]==ov), None)
-                    if not sc:
-                        movies[nt]["screenings"].append({"city": "Roma", "cinema": nc, "zone": get_zone(nc), "isOV": ov, "language": "V.O. · Sub ITA" if ov else "Italiano", "showtimes": it["st"], "times": [x["time"] for x in it["st"]], "bookingUrl": it["url"]})
-                    else:
-                        m = {x["time"]: x["url"] for x in sc["showtimes"]}
-                        for x in it["st"]:
-                            if x["time"] not in m or m[x["time"]] == c_url:
-                                m[x["time"]] = x["url"]
-                        sc["showtimes"] = [{"time": k, "url": v} for k, v in sorted(m.items())]
-                        sc["times"] = [x["time"] for x in sc["showtimes"]]
-            except Exception:
-                pass
-        b.close()
-
-    res = list(movies.values())
-    if res:
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            json.dump(res, f, ensure_ascii=False, indent=2)
-        print(f"✅ Salvati {len(res)} film.")
-
-if __name__ == "__main__":
-    run()
+    excl = ["santa marinella","civitavecchia","velletri","tivoli","frascati","albano","anzio
