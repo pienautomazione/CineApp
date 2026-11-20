@@ -52,9 +52,14 @@
     async function getPoster(t, u){
       if(u && u.startsWith("http")) return u;
       if(pCache[t]!==undefined) return pCache[t];
-      const q=t.replace(/\([^)]*\)|\[[^\]]*\]/g,"").trim();
-      for(const c of ["it","us"]){try{const r=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&country=${c}&limit=2`),d=await r.json();if(d.results?.[0]?.artworkUrl100){return pCache[t]=d.results[0].artworkUrl100.replace("100x100bb","600x600bb");}}catch(e){}}
-      try{const w=await fetch(`https://it.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q+" film")}&gsrlimit=2&prop=pageimages&pithumbsize=600&format=json&origin=*`),wd=await w.json();for(const p of Object.values(wd.query?.pages||{})){if(p.thumbnail?.source)return pCache[t]=p.thumbnail.source;}}catch(e){}
+      const q=t.replace(/\([^)]*\)|\[[^\]]*\]/g,"").trim().toLowerCase();
+      for(const c of ["it","us"]){
+        try{
+          const r=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&country=${c}&limit=5`),d=await r.json();
+          const hit=(d.results||[]).find(x=>(x.trackName||"").toLowerCase().trim()===q);
+          if(hit?.artworkUrl100) return pCache[t]=hit.artworkUrl100.replace("100x100bb","600x600bb");
+        }catch(e){}
+      }
       return pCache[t]="";
     }
     async function load(){
