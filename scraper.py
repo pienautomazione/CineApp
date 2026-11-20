@@ -47,6 +47,64 @@ JS_GET_CINEMA_CARDS = r"""
 }
 """
 
+JS_EXTRACT_CLEAN_DOM = r"""
+() => {
+    const results = [];
+    // Accetta SOLO orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:30, 18:45, 20:15, 22:30)
+    const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
+    const seen = new Set();
+
+    document.querySelectorAll('h1, h2, h3, h4, strong, [class*="title"], [class*="titolo"]').forEach(titleEl => {
+        const title = (titleEl.innerText || '').trim();
+        if (title.length < 3 || title.length > 75 || seen.has(title.toLowerCase())) return;
+        if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio/i.test(title)) return;
+
+        let container = titleEl.parentElement;
+        for (let i = 0; i < 4 && container; i++) {
+            // Legge solo i bottoni/badge cliccabili degli spettacoli
+            const candidates = container.querySelectorAll('button, a, [class*="time"], [class*="orario"], [class*="hour"], [class*="show"]');
+            const times = [];
+            candidates.forEach(el => {
+                if (el.children.length === 0) {
+                    const txt = (el.innerText || '').trim();
+                    if (validShowtimeRegex.test(txt)) {
+                        times.push(txt);
+                    }
+                }
+            });
+
+            if (times.length > 0 && times.length <= 10) {
+                let poster = '';
+                const img = container.querySelector('img');
+                if (img && img.src && img.src.startsWith('http') && !/logo|icon|flag|placeholder/i.test(img.src)) {
+                    poster = img.src;
+                }
+                if (!poster) {
+                    const bgNodes = container.querySelectorAll('[style*="background-image"]');
+                    for (const n of bgNodes) {
+                        const m = (n.style.backgroundImage || '').match(/url\(["']?(https?:\/\/[^"')]+)["']?\)/);
+                        if (m && !/logo|icon|flag|placeholder/i.test(m[1])) {
+                            poster = m[1];
+                            break;
+                        }
+                    }
+                }
+
+                seen.add(title.toLowerCase());
+                results.push({
+                    title: title,
+                    times: [...new Set(times)].sort(),
+                    poster: poster
+                });
+                break;
+            }
+            container = container.parentElement;
+        }
+    });
+    return results;
+}
+"""
+
 def fetch_hd_poster(title: str) -> str:
     if title in POSTER_CACHE:
         return POSTER_CACHE[title]
@@ -54,17 +112,19 @@ def fetch_hd_poster(title: str) -> str:
     try:
         r = requests.get(
             "https://itunes.apple.com/search",
-            params={"term": search_term, "media": "movie", "country": "it", "limit": 1},
+            params={"term": search_term, "media": "movie", "country": "it", "limit": 3},
             timeout=6
         )
         if r.status_code == 200:
             results = r.json().get("results", [])
-            if results:
-                art = results[0].get("artworkUrl100", "")
-                if art:
-                    hd_art = art.replace("100x100bb", "600x600bb")
-                    POSTER_CACHE[title] = hd_art
-                    return hd_art
+            for item in results:
+                track = (item.get("trackName") or "").lower()
+                if search_term.lower() in track or track in search_term.lower() or len(results) == 1:
+                    art = item.get("artworkUrl100", "")
+                    if art:
+                        hd_art = art.replace("100x100bb", "600x600bb")
+                        POSTER_CACHE[title] = hd_art
+                        return hd_art
     except Exception:
         pass
     POSTER_CACHE[title] = ""
@@ -78,7 +138,6 @@ def detect_zone(cinema_name: str) -> str:
     return "Roma"
 
 def detect_original_version(raw_title: str) -> bool:
-    """Rileva se la proiezione è in Versione Originale (O.V. / V.O. / Sub Ita)."""
     return bool(re.search(
         r"(?:\bO\.?V\.?\b|\bV\.?O\.?S?\.?\b|SUB\s*ITA|VERSIONE\s*ORIGINALE|ORIGINAL\s*VERSION)",
         raw_title,
@@ -92,93 +151,26 @@ def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", cleaned)
     return " ".join(cleaned.split()).strip().title()
 
-def extract_from_json_payload(payload, today_iso: str, found_list: list):
-    if isinstance(payload, dict):
-        title = ""
-        for k in ["Title", "title", "EventName", "eventName", "MovieTitle", "movieTitle", "Descrizione", "descrizione"]:
-            if isinstance(payload.get(k), str) and len(payload[k].strip()) >= 2:
-                title = payload[k].strip()
-                break
-
-        if title:
-            poster = ""
-            for pk in ["Poster", "poster", "Image", "image", "ImageUrl", "imageUrl", "Locandina", "locandina", "Picture"]:
-                if isinstance(payload.get(pk), str) and payload[pk].startswith("http"):
-                    poster = payload[pk]
-                    break
-
-            raw_str = json.dumps(payload)
-            today_matches = re.findall(rf"{today_iso}[T\s]+([01]?\d|2[0-3]):([0-5]\d)", raw_str)
-            if today_matches:
-                times = [f"{h.zfill(2)}:{m}" for h, m in today_matches]
-                found_list.append({"title": title, "times": list(dict.fromkeys(times)), "poster": poster})
-            else:
-                perfs = payload.get("Performances") or payload.get("performances") or payload.get("Shows") or payload.get("shows") or []
-                if isinstance(perfs, list) and perfs:
-                    p_str = json.dumps(perfs)
-                    times = re.findall(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", p_str)
-                    if times:
-                        found_list.append({"title": title, "times": list(dict.fromkeys(times)), "poster": poster})
-
-        for v in payload.values():
-            extract_from_json_payload(v, today_iso, found_list)
-    elif isinstance(payload, list):
-        for item in payload:
-            extract_from_json_payload(item, today_iso, found_list)
-
-def parse_today_dom_fallback(page) -> list:
-    return page.evaluate(r"""
-    () => {
-        const results = [];
-        const timeRegex = /^([01]?\d|2[0-3]):[0-5]\d$/;
-        const seen = new Set();
-
-        document.querySelectorAll('h1, h2, h3, h4, strong, [class*="title"], [class*="titolo"]').forEach(titleEl => {
-            const title = (titleEl.innerText || '').trim();
-            if (title.length < 3 || title.length > 75 || seen.has(title.toLowerCase())) return;
-            if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio/i.test(title)) return;
-
-            let container = titleEl.parentElement;
-            for (let i = 0; i < 4 && container; i++) {
-                const buttons = container.querySelectorAll('button, a[href*="buy"], a[href*="seat"], [class*="time"], [class*="orario"]');
-                const times = [];
-                buttons.forEach(b => {
-                    const txt = (b.innerText || '').trim();
-                    if (timeRegex.test(txt)) {
-                        const h = parseInt(txt.split(':')[0], 10);
-                        if (h >= 10 || h === 0) {
-                            times.push(txt);
-                        }
-                    }
-                });
-                if (times.length > 0 && times.length <= 12) {
-                    let poster = '';
-                    const img = container.querySelector('img');
-                    if (img && img.src && img.src.startsWith('http') && !/logo|icon|flag|placeholder/i.test(img.src)) {
-                        poster = img.src;
-                    }
-                    seen.add(title.toLowerCase());
-                    results.push({ title, times: [...new Set(times)].sort(), poster });
-                    break;
-                }
-                container = container.parentElement;
-            }
-        });
-        return results;
-    }
-    """)
+def filter_round_times(times: list) -> list:
+    """Mantiene solo orari cinema reali (10:00-23:55 con minuti multipli di 5, es. :00, :15, :30, :45)."""
+    valid = []
+    for t in dict.fromkeys(times):
+        m = re.match(r"^([12]\d):([0-5][05])$", t.strip())
+        if m:
+            valid.append(t.strip())
+    return sorted(valid)
 
 def scrape_all_rome():
-    today_iso = datetime.now().strftime("%Y-%m-%d")
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta completa Roma per la data {today_iso}...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta pulita cinema Roma...")
     movies_dict = {}
     counter = 1
 
     def add_screening(raw_title: str, cinema_name: str, times: list, booking_url: str, poster: str = ""):
         nonlocal counter
+        cleaned_times = filter_round_times(times)
         is_ov = detect_original_version(raw_title)
         norm_title = normalize_title(raw_title)
-        if not norm_title or len(norm_title) < 3 or not times:
+        if not norm_title or len(norm_title) < 3 or not cleaned_times:
             return
 
         if not poster:
@@ -210,7 +202,6 @@ def scrape_all_rome():
         clean_c_name = re.sub(r"\s*[-–|]?\s*Roma$", "", cinema_name, flags=re.I).strip()
         lang_label = "V.O. · Sub ITA" if is_ov else "ITA"
 
-        # Distingue eventuale proiezione ITA e V.O. nello stesso cinema
         existing = next(
             (s for s in movies_dict[norm_title]["screenings"] if s["cinema"] == clean_c_name and s.get("isOV", False) == is_ov),
             None
@@ -222,11 +213,11 @@ def scrape_all_rome():
                 "zone": detect_zone(clean_c_name),
                 "isOV": is_ov,
                 "language": lang_label,
-                "times": sorted(list(dict.fromkeys(times))),
+                "times": cleaned_times,
                 "bookingUrl": booking_url
             })
         else:
-            existing["times"] = sorted(list(dict.fromkeys(existing["times"] + times)))
+            existing["times"] = filter_round_times(existing["times"] + cleaned_times)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -288,7 +279,7 @@ def scrape_all_rome():
             if not next_clicked:
                 break
 
-        print(f"Trovati {len(all_cinema_names)} cinema a Roma su Webtic: {[c[1] for c in all_cinema_names]}")
+        print(f"Trovati {len(all_cinema_names)} cinema a Roma: {[c[1] for c in all_cinema_names]}")
 
         for target_page, cinema_name in all_cinema_names:
             try:
@@ -313,27 +304,14 @@ def scrape_all_rome():
                 if not cinema_el.is_visible(timeout=1200):
                     continue
 
-                intercepted = []
-                def handle_response(response):
-                    try:
-                        ct = response.headers.get("content-type", "")
-                        if "json" in ct and response.status == 200:
-                            extract_from_json_payload(response.json(), today_iso, intercepted)
-                    except Exception:
-                        pass
-
-                page.on("response", handle_response)
                 cinema_el.click()
                 page.wait_for_timeout(3200)
                 booking_url = page.url
 
-                if not intercepted:
-                    intercepted = parse_today_dom_fallback(page)
+                extracted = page.evaluate(JS_EXTRACT_CLEAN_DOM)
+                print(f"→ {cinema_name}: {len(extracted)} film")
 
-                page.remove_listener("response", handle_response)
-                print(f"→ {cinema_name}: {len(intercepted)} film")
-
-                for it in intercepted:
+                for it in extracted:
                     add_screening(it["title"], cinema_name, it["times"], booking_url, it.get("poster", ""))
 
             except Exception as e:
