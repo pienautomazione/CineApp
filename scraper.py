@@ -1,12 +1,10 @@
-import json
-import re
+import json, re
 from datetime import datetime
-import requests
 from playwright.sync_api import sync_playwright
 
 OUTPUT_FILE = "movies.json"
 
-ROME_ZONES = {
+ZONES = {
     "barberini": "Centro", "quattro fontane": "Centro", "farnese": "Campo de' Fiori",
     "fiamma": "Centro", "troisi": "Trastevere", "sacher": "Trastevere",
     "intrastevere": "Trastevere", "reale": "Trastevere", "adriano": "Prati",
@@ -21,81 +19,157 @@ ROME_ZONES = {
     "doria": "Prati", "trianon": "Appio"
 }
 
-GRADIENTS = [
+GRADS = [
     ("from-[#3a2818] via-[#1c1613] to-[#0a0a0c]", "bg-amber-500/20 text-amber-300"),
     ("from-[#162942] via-[#101824] to-[#0a0a0c]", "bg-sky-500/20 text-sky-300"),
     ("from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]", "bg-rose-500/20 text-rose-300"),
-    ("from-[#17332b] via-[#101c19] to-[#0a0a0c]", "bg-emerald-500/20 text-emerald-300"),
-    ("from-[#2c1d42] via-[#181224] to-[#0a0a0c]", "bg-purple-500/20 text-purple-300")
+    ("from-[#17332b] via-[#101c19] to-[#0a0a0c]", "bg-emerald-500/20 text-emerald-300")
 ]
 
-POSTER_CACHE = {}
+def norm_cinema(raw):
+    n = re.sub(r"\s*[-–|]?\s*Roma$", "", raw, flags=re.I).strip()
+    n = re.sub(r"^(?:Multisala|Nuovo\s+Cinema|Cinema)\s+", "", n, flags=re.I).strip()
+    return "Cineferonia" if ("cineferonia" in n.lower() or "fiano" in n.lower()) else (n.title() or raw.strip())
 
-JS_GET_CINEMA_CARDS = r"""
-() => {
-    const names = [];
-    const seen = new Set();
-    const ignore = /^(salta al|eventi|locali|magazine|chi siamo|privacy|scegli il locale|cerca eventi|provincia|roma|tutta italia|crea informatica|accedi|carrello|tutti|oggi|cookie|\d+)$/i;
+def get_zone(c):
+    return next((z for k, z in ZONES.items() if k in c.lower()), "Roma")
 
-    document.querySelectorAll('h1, h2, h3, h4, h5, strong, [class*="title"], [class*="name"]').forEach(el => {
-        if (el.children.length > 2) return;
-        const txt = (el.innerText || '').trim().split('\n')[0].trim();
-        if (txt.length < 4 || txt.length > 50) return;
-        if (txt.includes(',') || /\b(via|viale|piazza|corso|largo|piazzale|lido)\b/i.test(txt)) return;
-        if (ignore.test(txt) || /crea informatica|cookie|privacy/i.test(txt)) return;
-        if (!seen.has(txt.toLowerCase())) {
-            seen.add(txt.toLowerCase());
-            names.push(txt);
-        }
-    });
-    return names;
-}
-"""
+def is_ov(raw):
+    return bool(re.search(r"(?:\bO\.?V\.?\b|\bV\.?O\.?S?\.?\b|SUB\s*ITA|VERSIONE\s*ORIGINALE)", raw, re.I))
 
-JS_GET_DOM_POSTERS = r"""
-() => {
-    const posters = [];
-    document.querySelectorAll('img').forEach(img => {
-        const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
-        if (!src || !src.startsWith('http') || /logo|icon|flag|placeholder|avatar|sprite/i.test(src)) return;
-        if (img.naturalWidth > 0 && img.naturalWidth < 45) return;
+def norm_title(raw):
+    c = re.sub(r"^\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|EVENTO|SUB\s*ITA)[\)\]]\s*", "", raw, flags=re.I)
+    c = re.sub(r"\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB\s*ITA|VM\d+|EVENTO|\bIT\b)[\)\]]", "", c, flags=re.I)
+    c = re.sub(r"\b(?:O\.?V\.?|V\.?O\.?S?\.?|SUB\s*ITA)\b\s*$", "", c, flags=re.I)
+    return " ".join(re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", c).split()).strip().title()
 
-        let box = img.parentElement;
-        for (let i = 0; i < 4 && box; i++) {
-            const text = (box.innerText || '').trim();
-            if (text.length >= 3 && text.length <= 300) {
-                posters.push({ text: text.toLowerCase(), src });
-                break;
-            }
-            box = box.parentElement;
-        }
-    });
-    return posters;
-}
-"""
+def find_img(obj):
+    raw = json.dumps(obj)
+    m = re.search(r"https?://[^\"'\s]+\.(?:jpg|jpeg|png|webp)(?:\?[^\"'\s]*)?", raw, re.I)
+    if m and not re.search(r"logo|icon|flag|placeholder|avatar|sprite", m.group(0), re.I):
+        return m.group(0)
+    r = re.search(r"\"(/[^\"'\s]+\.(?:jpg|jpeg|png|webp))\"", raw, re.I)
+    return f"https://www.webtic.it{r.group(1)}" if (r and not re.search(r"logo|icon|flag|placeholder|avatar|sprite", r.group(1), re.I)) else ""
 
-def dismiss_cookies(page):
-    try:
-        page.evaluate("""() => {
-            document.querySelectorAll('[class*="cookie"], [id*="cookie"], .cdk-overlay-backdrop').forEach(el => el.remove());
-        }""")
-    except Exception:
-        pass
+def parse_json(data, today, base_url, out):
+    if isinstance(data, dict):
+        t = next((data[k].strip() for k in ["Title","title","EventName","eventName","MovieTitle","movieTitle","Descrizione","descrizione"] if isinstance(data.get(k), str) and 2 <= len(data[k].strip()) <= 80), "")
+        if t:
+            ev_id = next((str(data[k]).strip() for k in ["EventId","eventId","EventCode","eventCode","Code","code","Id","id","IdEvento","idEvento"] if isinstance(data.get(k), (int, str)) and len(str(data[k]).strip()) >= 2), "")
+            url = f"{base_url.split('?')[0].rstrip('/')}/event/{ev_id}" if (ev_id and "/local/" in base_url and "/event/" not in base_url) else base_url
+            times = re.findall(rf"{today}[T\s]+([12]\d):([0-5][05])", json.dumps(data))
+            if times:
+                out.append({"raw": t, "poster": find_img(data), "url": url, "st": [{"time": f"{h}:{m}", "url": url} for h, m in sorted(set(times))]})
+        for v in data.values():
+            parse_json(v, today, base_url, out)
+    elif isinstance(data, list):
+        for i in data:
+            parse_json(i, today, base_url, out)
 
-def fetch_hd_poster(title: str) -> str:
-    if title in POSTER_CACHE:
-        return POSTER_CACHE[title]
-    search_term = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", title).strip()
+def run():
+    today = datetime.now().strftime("%Y-%m-%d")
+    movies, idx = {}, 1
+    excl = ["santa marinella","civitavecchia","velletri","tivoli","frascati","albano","anzio","nettuno","pomezia","guidonia","colleferro","bracciano","fiumicino","monterotondo","palestrina","ladispoli","grottaferrata","trevignano","ostia","parco leonardo"]
 
-    for country in ["it", "us"]:
-        try:
-            r = requests.get(
-                "https://itunes.apple.com/search",
-                params={"term": search_term, "media": "movie", "country": country, "limit": 5},
-                timeout=5
-            )
-            if r.status_code == 200:
-                results = r.json().get("results", [])
-                for item in results:
-                    track = (item.get("trackName") or "").lower()
-                    if search_term.lower
+    with sync_playwright() as p:
+        b = p.chromium.launch(headless=True, args=["--disable-http2","--no-sandbox"])
+        page = b.new_page(viewport={"width": 1280, "height": 900}, locale="it-IT")
+        list_url = "https://www.webtic.it/app/main/all-locals/RM"
+        page.goto(list_url, wait_until="domcontentloaded", timeout=25000)
+        page.wait_for_timeout(2500)
+        page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"],.cdk-overlay-backdrop').forEach(e=>e.remove())")
+
+        cinemas, seen = [], set()
+        for pg in range(1, 8):
+            page.mouse.wheel(0, 3000)
+            page.wait_for_timeout(500)
+            names = page.evaluate("""() => [...document.querySelectorAll('h1,h2,h3,h4,h5,strong,[class*="title"],[class*="name"]')].map(e=>(e.innerText||'').trim().split('\\n')[0].trim()).filter(t=>t.length>=4&&t.length<=50&&!t.includes(',')&&!/crea informatica|cookie|privacy|eventi|locali|provincia|tutta italia/i.test(t))""")
+            for n in names:
+                if not any(x in n.lower() for x in excl) and norm_cinema(n).lower() not in seen:
+                    seen.add(norm_cinema(n).lower())
+                    cinemas.append((pg, n))
+            nxt = page.locator(f"button:has-text('{pg+1}'), a:has-text('{pg+1}')").first
+            if nxt.is_visible(timeout=400):
+                nxt.click(force=True)
+                page.wait_for_timeout(1500)
+            else:
+                break
+
+        print(f"Cinema trovati: {len(cinemas)}")
+        for pg, cname in cinemas:
+            try:
+                if page.url != list_url:
+                    page.goto(list_url, wait_until="domcontentloaded", timeout=15000)
+                    page.wait_for_timeout(1500)
+                    page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"]').forEach(e=>e.remove())")
+                for p_i in range(1, pg):
+                    b_pg = page.locator(f"button:has-text('{p_i+1}'), a:has-text('{p_i+1}')").first
+                    if b_pg.is_visible(timeout=400):
+                        b_pg.click(force=True)
+                        page.wait_for_timeout(1000)
+
+                el = page.get_by_text(cname, exact=False).first
+                if not el.is_visible(timeout=700): continue
+                payloads = []
+                fn = lambda r: payloads.append(r.json()) if ("json" in r.headers.get("content-type","") and r.status==200) else None
+                page.on("response", fn)
+                el.click(force=True, timeout=4000)
+                page.wait_for_timeout(2200)
+                c_url = page.url
+                oggi = page.get_by_text("Oggi", exact=True).first
+                if oggi.is_visible(timeout=800):
+                    oggi.click(force=True, timeout=2000)
+                    page.wait_for_timeout(1400)
+                page.remove_listener("response", fn)
+
+                ext = []
+                for pl in payloads: parse_json(pl, today, c_url, ext)
+                for it in ext:
+                    try:
+                        href = page.evaluate("""t => { const a = [...document.querySelectorAll('a[href*="/event/"]')].find(x=>(x.innerText||'').toLowerCase().includes(t.toLowerCase())); return a ? a.href : ''; }""", it["raw"])
+                        if href:
+                            it["url"] = href
+                            for s in it["st"]: s["url"] = href
+                        else:
+                            ev = page.get_by_text(it["raw"], exact=False).first
+                            if ev.is_visible(timeout=600):
+                                ev.click(force=True, timeout=2000)
+                                page.wait_for_url("**/event/**", timeout=2500)
+                                if "/event/" in page.url:
+                                    it["url"] = page.url
+                                    for s in it["st"]: s["url"] = page.url
+                                    page.go_back(timeout=3000)
+                                    page.wait_for_timeout(800)
+                    except Exception:
+                        pass
+
+                print(f"→ {cname}: {len(ext)} film")
+                for it in ext:
+                    ov, nt, nc = is_ov(it["raw"]), norm_title(it["raw"]), norm_cinema(cname)
+                    if len(nt) < 3: continue
+                    if nt not in movies:
+                        g, a = GRADS[(idx-1) % len(GRADS)]
+                        movies[nt] = {"id": idx, "title": nt, "genre": "In Sala · Oggi", "duration": "Oggi", "rating": "★", "posterUrl": it["poster"], "gradient": g, "accent": a, "tag": "ROMA", "hasOV": ov, "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.", "screenings": []}
+                        idx += 1
+                    elif not movies[nt]["posterUrl"] and it["poster"]:
+                        movies[nt]["posterUrl"] = it["poster"]
+                    sc = next((s for s in movies[nt]["screenings"] if s["cinema"].lower()==nc.lower() and s["isOV"]==ov), None)
+                    if not sc:
+                        movies[nt]["screenings"].append({"city": "Roma", "cinema": nc, "zone": get_zone(nc), "isOV": ov, "language": "V.O. · Sub ITA" if ov else "Italiano", "showtimes": it["st"], "times": [x["time"] for x in it["st"]], "bookingUrl": it["url"]})
+                    else:
+                        m = {x["time"]: x["url"] for x in sc["showtimes"]}
+                        for x in it["st"]: m[x["time"]] = x["url"]
+                        sc["showtimes"] = [{"time": k, "url": v} for k, v in sorted(m.items())]
+                        sc["times"] = [x["time"] for x in sc["showtimes"]]
+            except Exception:
+                pass
+        b.close()
+
+    res = list(movies.values())
+    if res:
+        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(res, f, ensure_ascii=False, indent=2)
+        print(f"✅ Salvati {len(res)} film.")
+
+if __name__ == "__main__":
+    run()
