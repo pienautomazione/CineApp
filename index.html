@@ -54,24 +54,74 @@
     <div id="moviesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
   </main>
 
-  <div id="movieModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center">
-    <div class="bg-[#141418] border border-white/10 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88vh] overflow-y-auto p-5">
-      <div class="flex justify-between items-start gap-3 mb-3">
-        <div>
-          <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">IN SALA</span>
-          <h2 id="modalTitle" class="text-xl font-bold text-white mt-1"></h2>
-          <p id="modalMeta" class="text-xs text-zinc-400 mt-0.5"></p>
+  <!-- Scheda Film Completa (Full-screen su mobile, modale ampio su desktop) -->
+  <div id="movieModal" class="fixed inset-0 z-50 hidden bg-[#0a0a0c] sm:bg-black/85 sm:backdrop-blur-md overflow-y-auto">
+    <div class="min-h-screen sm:min-h-0 sm:my-8 sm:mx-auto sm:max-w-xl bg-[#121216] sm:border sm:border-white/15 sm:rounded-3xl overflow-hidden shadow-2xl pb-12">
+      <!-- Copertina & Tasto Chiudi -->
+      <div class="relative w-full h-72 sm:h-80 bg-zinc-900">
+        <img id="modalPoster" src="" alt="" class="w-full h-full object-cover hidden" />
+        <div id="modalPosterFallback" class="w-full h-full bg-gradient-to-br from-amber-900/40 via-zinc-900 to-[#121216] flex items-end p-5">
+          <span class="text-xs uppercase tracking-widest text-white/40 font-semibold">Biglietteria Ufficiale</span>
         </div>
-        <button onclick="closeModal()" class="p-2 rounded-full bg-white/10 text-zinc-300">✕</button>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#121216] via-[#121216]/30 to-transparent"></div>
+        <button onclick="closeModal()" class="fixed sm:absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/70 border border-white/20 text-white flex items-center justify-center text-base shadow-lg">✕</button>
       </div>
-      <p id="modalSynopsis" class="text-sm text-zinc-300 mb-4"></p>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2.5">Sale e Orari</h3>
-      <div id="modalScreenings" class="space-y-3"></div>
+
+      <!-- Dettagli Film -->
+      <div class="px-5 -mt-12 relative z-10">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded bg-amber-400 text-black">IN SALA OGGI</span>
+          <span id="modalLangTag" class="hidden text-[10px] font-bold uppercase px-2.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30">🌍 V.O. DISPONIBILE</span>
+        </div>
+        <h2 id="modalTitle" class="text-2xl font-extrabold text-white leading-tight"></h2>
+        <p id="modalMeta" class="text-xs text-zinc-400 mt-1"></p>
+        <p id="modalSynopsis" class="text-sm text-zinc-300 leading-relaxed mt-3 mb-6"></p>
+
+        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3">Sale e Orari di Oggi · Tocca per prenotare</h3>
+        <div id="modalScreenings" class="space-y-3"></div>
+      </div>
     </div>
   </div>
 
   <script>
     let allMovies = [], lang = "ALL";
+    const clientPosterCache = {};
+
+    async function resolvePoster(title, existingUrl) {
+      if (existingUrl && existingUrl.startsWith("http")) return existingUrl;
+      if (clientPosterCache[title] !== undefined) return clientPosterCache[title];
+      const clean = title.replace(/\([^)]*\)|\[[^\]]*\]/g, "").trim();
+      for (const country of ["it", "us"]) {
+        try {
+          const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(clean)}&media=movie&country=${country}&limit=3`);
+          const data = await r.json();
+          if (data.results && data.results.length) {
+            const art = (data.results[0].artworkUrl100 || "").replace("100x100bb", "600x600bb");
+            if (art) { clientPosterCache[title] = art; return art; }
+          }
+        } catch (e) {}
+      }
+      clientPosterCache[title] = "";
+      return "";
+    }
+
+    async function hydrateMissingPosters() {
+      for (const m of allMovies) {
+        if (!m.posterUrl) {
+          const found = await resolvePoster(m.title, "");
+          if (found) {
+            m.posterUrl = found;
+            const imgEl = document.getElementById(`poster-img-${m.id}`);
+            const fbEl = document.getElementById(`poster-fb-${m.id}`);
+            if (imgEl && fbEl) {
+              imgEl.src = found;
+              imgEl.classList.remove("hidden");
+              fbEl.classList.add("hidden");
+            }
+          }
+        }
+      }
+    }
 
     async function loadMovies() {
       try {
@@ -81,6 +131,7 @@
         document.getElementById("citySelect").innerHTML = `<option value="" class="bg-[#141418]">1. Tutte le città (${cities.length})</option>` +
           cities.map(c => `<option value="${c}" class="bg-[#141418]">${c}</option>`).join("");
         renderMovies();
+        hydrateMissingPosters();
       } catch (e) {
         document.getElementById("movieCount").textContent = "Errore dati";
       }
@@ -150,12 +201,17 @@
 
       document.getElementById("moviesGrid").innerHTML = filtered.length ? filtered.map(m => {
         const sc = filterS(m.screenings, city, cinema);
-        const poster = m.posterUrl
-          ? `<div class="w-full h-56 bg-zinc-900 overflow-hidden"><img src="${m.posterUrl}" alt="${m.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.style.display='none'" /></div>`
-          : `<div class="w-full h-36 bg-gradient-to-br ${m.gradient || 'from-zinc-800 to-zinc-950'} flex items-end p-4"><span class="text-xs uppercase tracking-widest text-white/50 font-semibold">Biglietteria Ufficiale</span></div>`;
+        const hasPoster = Boolean(m.posterUrl);
 
         return `<article onclick="openModal(${m.id})" class="bg-[#141418] border border-white/10 rounded-2xl overflow-hidden shadow-lg cursor-pointer flex flex-col">
-          ${poster}
+          <div class="w-full h-56 bg-zinc-900 overflow-hidden relative">
+            <img id="poster-img-${m.id}" src="${m.posterUrl || ''}" alt="${m.title}"
+              class="w-full h-full object-cover ${hasPoster ? '' : 'hidden'}" loading="lazy"
+              onerror="this.classList.add('hidden'); document.getElementById('poster-fb-${m.id}').classList.remove('hidden');" />
+            <div id="poster-fb-${m.id}" class="w-full h-full bg-gradient-to-br ${m.gradient || 'from-zinc-800 to-zinc-950'} flex items-end p-4 ${hasPoster ? 'hidden' : ''}">
+              <span class="text-xs uppercase tracking-widest text-white/50 font-semibold">Biglietteria Ufficiale</span>
+            </div>
+          </div>
           <div class="p-4 flex-1 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center gap-2 mb-1">
@@ -186,27 +242,50 @@
       }).join("") : `<div class="col-span-full text-center py-12 text-zinc-400 text-sm">Nessun film trovato.</div>`;
     }
 
-    function openModal(id) {
+    async function openModal(id) {
       const m = allMovies.find(x => x.id === id);
       if (!m) return;
       const sc = filterS(m.screenings, document.getElementById("citySelect").value, document.getElementById("cinemaSelect").value);
+
       document.getElementById("modalTitle").textContent = m.title;
-      document.getElementById("modalMeta").textContent = `${m.genre || 'In Sala'} · ${m.duration || 'Oggi'}`;
+      document.getElementById("modalMeta").textContent = `${m.genre || 'In Sala'} · ${sc.length} ${sc.length === 1 ? 'sala disponibile' : 'sale disponibili'}`;
       document.getElementById("modalSynopsis").textContent = m.synopsis || "";
+      document.getElementById("modalLangTag").classList.toggle("hidden", !sc.some(s => s.isOV));
+
+      const imgEl = document.getElementById("modalPoster");
+      const fbEl = document.getElementById("modalPosterFallback");
+      const poster = await resolvePoster(m.title, m.posterUrl);
+      if (poster) {
+        imgEl.src = poster;
+        imgEl.classList.remove("hidden");
+        fbEl.classList.add("hidden");
+      } else {
+        imgEl.classList.add("hidden");
+        fbEl.classList.remove("hidden");
+      }
+
       document.getElementById("modalScreenings").innerHTML = sc.map(s => `
-        <div class="bg-white/5 border border-white/10 rounded-xl p-3">
-          <div class="flex justify-between items-center mb-2 gap-2">
-            <span class="font-semibold text-sm text-white">${s.cinema}</span>
-            <span class="px-2 py-0.5 rounded ${s.isOV ? 'bg-sky-500/20 text-sky-300 font-bold' : 'bg-white/10 text-zinc-300'} text-[10px]">${s.isOV ? '🌍 V.O. · Sub ITA' : '🇮🇹 Italiano'}</span>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <div class="flex justify-between items-center mb-2.5 gap-2">
+            <div>
+              <div class="font-bold text-base text-white">${s.cinema}</div>
+              <div class="text-xs text-zinc-400">${s.zone || s.city}</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg ${s.isOV ? 'bg-sky-500/20 text-sky-300 border border-sky-400/30 font-bold' : 'bg-white/10 text-zinc-300'} text-xs">${s.isOV ? '🌍 V.O. · Sub ITA' : '🇮🇹 Italiano'}</span>
           </div>
           <div class="flex flex-wrap gap-2">
-            ${getTimes(s).map(st => `<a href="${st.url}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-amber-400 text-black text-xs font-bold">${st.time} · Prenota</a>`).join("")}
+            ${getTimes(s).map(st => `<a href="${st.url}" target="_blank" rel="noopener" class="px-3.5 py-2 rounded-xl bg-amber-400 text-black text-xs font-extrabold">${st.time} · Scegli posto</a>`).join("")}
           </div>
         </div>`).join("");
+
+      document.body.style.overflow = "hidden";
       document.getElementById("movieModal").classList.remove("hidden");
     }
 
-    function closeModal() { document.getElementById("movieModal").classList.add("hidden"); }
+    function closeModal() {
+      document.body.style.overflow = "";
+      document.getElementById("movieModal").classList.add("hidden");
+    }
 
     document.getElementById("titleInput").addEventListener("input", e => {
       const q = e.target.value.trim().toLowerCase();
