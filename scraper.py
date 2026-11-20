@@ -34,7 +34,7 @@ JS_GET_CINEMA_CARDS = r"""
 () => {
     const names = [];
     const seen = new Set();
-    const ignore = /^(salta al|eventi|locali|magazine|chi siamo|privacy|scegli il locale|cerca eventi|provincia|roma|tutta italia|crea informatica|accedi|carrello|\d+)$/i;
+    const ignore = /^(salta al|eventi|locali|magazine|chi siamo|privacy|scegli il locale|cerca eventi|provincia|roma|tutta italia|crea informatica|accedi|carrello|tutti|oggi|\d+)$/i;
 
     document.querySelectorAll('h1, h2, h3, h4, h5, strong, [class*="title"], [class*="name"], [class*="local"]').forEach(el => {
         if (el.children.length > 2) return;
@@ -48,74 +48,66 @@ JS_GET_CINEMA_CARDS = r"""
 }
 """
 
-JS_EXTRACT_SHOWTIMES = r"""
-(fallbackUrl) => {
-    const results = [];
-    const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
+JS_LIST_TODAY_EVENTS = r"""
+() => {
+    const events = [];
     const seen = new Set();
+    const ignore = /^(salta al|eventi in programmazione|tutti|oggi|indietro|webtic|carrello|accedi|privacy|cookie|crea informatica|roma|lazio)$/i;
 
-    document.querySelectorAll('h1, h2, h3, h4, strong, [class*="title"], [class*="titolo"]').forEach(titleEl => {
-        const title = (titleEl.innerText || '').trim();
-        if (title.length < 3 || title.length > 75 || seen.has(title.toLowerCase())) return;
-        if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio/i.test(title)) return;
+    document.querySelectorAll('h1, h2, h3, h4, strong, [class*="title"], [class*="titolo"]').forEach(el => {
+        const rawTitle = (el.innerText || '').trim().split('\n')[0].trim();
+        if (rawTitle.length < 3 || rawTitle.length > 75 || ignore.test(rawTitle)) return;
+        if (seen.has(rawTitle.toLowerCase())) return;
 
-        let container = titleEl.parentElement;
-        for (let i = 0; i < 6 && container; i++) {
-            const dayContainers = container.querySelectorAll('[class*="day"], [class*="date"], [class*="giorno"], [class*="tab-pane"]');
-            const searchScope = dayContainers.length > 0 ? dayContainers[0] : container;
-
-            const candidates = searchScope.querySelectorAll('a, button, [class*="time"], [class*="orario"], [class*="hour"], [class*="show"]');
-            const showtimesMap = new Map();
-
-            candidates.forEach(el => {
-                if (el.children.length > 1) return;
-                const txt = (el.innerText || '').trim();
-                if (validShowtimeRegex.test(txt)) {
-                    const linkEl = el.tagName === 'A' ? el : el.closest('a');
-                    let directUrl = fallbackUrl;
-                    if (linkEl && linkEl.href && linkEl.href.startsWith('http') && !linkEl.href.endsWith('#')) {
-                        directUrl = linkEl.href;
-                    }
-                    if (!showtimesMap.has(txt)) {
-                        showtimesMap.set(txt, directUrl);
-                    }
+        // Cerca immagine locandina nella riga/card dell'evento
+        let poster = '';
+        let box = el.parentElement;
+        for (let i = 0; i < 4 && box; i++) {
+            const img = box.querySelector('img');
+            if (img) {
+                const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
+                if (src && src.startsWith('http') && !/logo|icon|flag|placeholder|avatar|sprite/i.test(src)) {
+                    poster = src;
+                    break;
                 }
-            });
-
-            if (showtimesMap.size > 0 && showtimesMap.size <= 9) {
-                let poster = '';
-                const imgs = container.querySelectorAll('img');
-                for (const img of imgs) {
-                    const src = img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('ng-src') || '';
-                    if (src && src.startsWith('http') && !/logo|icon|flag|placeholder|avatar|sprite/i.test(src)) {
-                        poster = src;
-                        break;
-                    }
-                }
-                if (!poster) {
-                    const allNodes = container.querySelectorAll('*');
-                    for (const n of allNodes) {
-                        const bg = window.getComputedStyle(n).backgroundImage || '';
-                        const m = bg.match(/url\(["']?(https?:\/\/[^"')]+)["']?\)/);
-                        if (m && !/logo|icon|flag|placeholder|avatar|sprite/i.test(m[1])) {
-                            poster = m[1];
-                            break;
-                        }
-                    }
-                }
-
-                const showtimes = Array.from(showtimesMap.entries())
-                    .map(([time, url]) => ({ time, url }))
-                    .sort((a, b) => a.time.localeCompare(b.time));
-
-                seen.add(title.toLowerCase());
-                results.push({ title, showtimes, poster });
-                break;
             }
-            container = container.parentElement;
+            box = box.parentElement;
+        }
+
+        seen.add(rawTitle.toLowerCase());
+        events.push({ rawTitle, poster });
+    });
+    return events;
+}
+"""
+
+JS_EXTRACT_EVENT_SHOWTIMES = r"""
+(eventUrl) => {
+    // Accetta SOLO orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:00, 18:15, 20:30, 22:45)
+    const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
+    const timesSet = new Set();
+
+    document.querySelectorAll('button, a, span, div').forEach(el => {
+        if (el.children.length === 0) {
+            const txt = (el.innerText || '').trim();
+            if (validShowtimeRegex.test(txt)) {
+                timesSet.add(txt);
+            }
         }
     });
-    return results;
+
+    let poster = '';
+    const imgs = document.querySelectorAll('img');
+    for (const img of imgs) {
+        const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
+        if (src && src.startsWith('http') && !/logo|icon|flag|placeholder|avatar|sprite/i.test(src)) {
+            poster = src;
+            break;
+        }
+    }
+
+    const showtimes = Array.from(timesSet).sort().map(t => ({ time: t, url: eventUrl }));
+    return { showtimes, poster };
 }
 """
 
@@ -123,8 +115,6 @@ def fetch_hd_poster(title: str) -> str:
     if title in POSTER_CACHE:
         return POSTER_CACHE[title]
     search_term = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", title).strip()
-
-    # 1. Prova iTunes Store (IT e US)
     for country in ["it", "us"]:
         try:
             r = requests.get(
@@ -144,33 +134,6 @@ def fetch_hd_poster(title: str) -> str:
                             return hd_art
         except Exception:
             pass
-
-    # 2. Fallback Wikipedia IT (ottimo per film italiani recenti usciti in sala)
-    try:
-        r = requests.get(
-            "https://it.wikipedia.org/w/api.php",
-            params={
-                "action": "query",
-                "generator": "search",
-                "gsrsearch": f"{search_term} film",
-                "gsrlimit": 2,
-                "prop": "pageimages",
-                "pithumbsize": 600,
-                "format": "json"
-            },
-            headers={"User-Agent": "CineApp/1.0"},
-            timeout=5
-        )
-        if r.status_code == 200:
-            pages = r.json().get("query", {}).get("pages", {})
-            for p_data in pages.values():
-                thumb = p_data.get("thumbnail", {}).get("source", "")
-                if thumb and thumb.startswith("http"):
-                    POSTER_CACHE[title] = thumb
-                    return thumb
-    except Exception:
-        pass
-
     POSTER_CACHE[title] = ""
     return ""
 
@@ -197,18 +160,17 @@ def detect_original_version(raw_title: str) -> bool:
 
 def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"^\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|EVENTO|SUB\s*ITA)[\)\]]\s*", "", raw, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB\s*ITA|VM\d+|EVENTO)[\)\]]", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*[\(\[](?:O\.?V\.?|V\.?O\.?S?\.?|2D|3D|DOLBY ATMOS|SUB\s*ITA|VM\d+|EVENTO|\bIT\b)[\)\]]", "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"\b(?:O\.?V\.?|V\.?O\.?S?\.?|SUB\s*ITA)\b\s*$", "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", cleaned)
     return " ".join(cleaned.split()).strip().title()
 
 def scrape_all_rome():
-    today_day = str(datetime.now().day)
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta pulita cinema Roma (giorno {today_day})...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta cinema Roma (Tab 'Oggi' + deep-link evento)...")
     movies_dict = {}
     counter = 1
 
-    def add_screening(raw_title: str, cinema_name: str, showtimes: list, fallback_url: str, poster: str = ""):
+    def add_screening(raw_title: str, cinema_name: str, showtimes: list, event_url: str, poster: str = ""):
         nonlocal counter
         is_ov = detect_original_version(raw_title)
         norm_title = normalize_title(raw_title)
@@ -231,7 +193,7 @@ def scrape_all_rome():
                 "accent": acc,
                 "tag": "ROMA",
                 "hasOV": is_ov,
-                "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto in sala e acquistare.",
+                "synopsis": "Biglietteria ufficiale. Tocca un orario per aprire la scheda spettacolo e scegliere il posto.",
                 "screenings": []
             }
             counter += 1
@@ -242,7 +204,7 @@ def scrape_all_rome():
                 movies_dict[norm_title]["hasOV"] = True
 
         clean_c_name = normalize_cinema_name(cinema_name)
-        lang_label = "V.O. · Sub ITA" if is_ov else "Lingua Italiana"
+        lang_label = "V.O. · Sub ITA" if is_ov else "Italiano"
 
         existing = next(
             (s for s in movies_dict[norm_title]["screenings"]
@@ -258,13 +220,12 @@ def scrape_all_rome():
                 "language": lang_label,
                 "showtimes": showtimes,
                 "times": [st["time"] for st in showtimes],
-                "bookingUrl": fallback_url
+                "bookingUrl": event_url
             })
         else:
             merged = {st["time"]: st["url"] for st in existing.get("showtimes", [])}
             for st in showtimes:
-                if st["time"] not in merged or merged[st["time"]] == fallback_url:
-                    merged[st["time"]] = st["url"]
+                merged[st["time"]] = st["url"]
             sorted_st = [{"time": t, "url": u} for t, u in sorted(merged.items())]
             existing["showtimes"] = sorted_st
             existing["times"] = [st["time"] for st in sorted_st]
@@ -330,13 +291,13 @@ def scrape_all_rome():
             if not next_clicked:
                 break
 
-        print(f"Trovati {len(all_cinema_names)} cinema unici: {[c[1] for c in all_cinema_names]}")
+        print(f"Trovati {len(all_cinema_names)} cinema unici a Roma: {[c[1] for c in all_cinema_names]}")
 
         for target_page, cinema_name in all_cinema_names:
             try:
                 if page.url != rome_list_url:
                     page.goto(rome_list_url, wait_until="domcontentloaded", timeout=20000)
-                    page.wait_for_timeout(2200)
+                    page.wait_for_timeout(2000)
 
                 for p_idx in range(1, target_page):
                     for selector in [f"button:has-text('{p_idx + 1}')", f"a:has-text('{p_idx + 1}')", "[aria-label*='Next']"]:
@@ -356,24 +317,47 @@ def scrape_all_rome():
                     continue
 
                 cinema_el.click()
-                page.wait_for_timeout(3200)
+                page.wait_for_timeout(2800)
                 cinema_url = page.url
 
-                for today_sel in ["button:has-text('Oggi')", "a:has-text('Oggi')", f"button:has-text('{today_day}/')"]:
+                # 1. Clicca obbligatoriamente sulla tab "Oggi" per escludere gli eventi futuri ("Tutti")
+                oggi_btn = page.get_by_text("Oggi", exact=True).first
+                if oggi_btn.is_visible(timeout=1200):
+                    oggi_btn.click()
+                    page.wait_for_timeout(1800)
+
+                # 2. Legge l'elenco dei film in programmazione Oggi con la loro locandina
+                today_events = page.evaluate(JS_LIST_TODAY_EVENTS)
+                # Esclude il nome stesso del cinema dalla lista titoli
+                today_events = [e for e in today_events if normalize_cinema_name(e["rawTitle"]).lower() != normalize_cinema_name(cinema_name).lower()]
+                print(f"→ {cinema_name}: {len(today_events)} film Oggi")
+
+                # 3. Entra in ciascun singolo film per prendere l'URL diretto dell'evento e i suoi orari
+                for ev in today_events:
                     try:
-                        t_btn = page.locator(today_sel).first
-                        if t_btn.is_visible(timeout=400):
-                            t_btn.click()
-                            page.wait_for_timeout(1000)
-                            break
+                        if page.url != cinema_url:
+                            page.goto(cinema_url, wait_until="domcontentloaded", timeout=15000)
+                            page.wait_for_timeout(1800)
+                            ob = page.get_by_text("Oggi", exact=True).first
+                            if ob.is_visible(timeout=800):
+                                ob.click()
+                                page.wait_for_timeout(1200)
+
+                        ev_el = page.get_by_text(ev["rawTitle"], exact=True).first
+                        if not ev_el.is_visible(timeout=800):
+                            ev_el = page.get_by_text(ev["rawTitle"], exact=False).first
+                        if not ev_el.is_visible(timeout=800):
+                            continue
+
+                        ev_el.click()
+                        page.wait_for_timeout(2200)
+                        direct_event_url = page.url
+
+                        details = page.evaluate(JS_EXTRACT_EVENT_SHOWTIMES, direct_event_url)
+                        poster_url = ev["poster"] or details.get("poster", "")
+                        add_screening(ev["rawTitle"], cinema_name, details.get("showtimes", []), direct_event_url, poster_url)
                     except Exception:
-                        pass
-
-                extracted = page.evaluate(JS_EXTRACT_SHOWTIMES, cinema_url)
-                print(f"→ {cinema_name}: {len(extracted)} film (con locandine: {sum(1 for x in extracted if x.get('poster'))})")
-
-                for it in extracted:
-                    add_screening(it["title"], cinema_name, it["showtimes"], cinema_url, it.get("poster", ""))
+                        continue
 
             except Exception as e:
                 print(f"  Errore su {cinema_name}: {e}")
