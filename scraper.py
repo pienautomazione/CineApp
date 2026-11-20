@@ -4,6 +4,7 @@ from playwright.sync_api import sync_playwright
 
 OUTPUT_FILE = "movies.json"
 ZONES = {"barberini":"Centro","quattro fontane":"Centro","farnese":"Campo de' Fiori","fiamma":"Centro","troisi":"Trastevere","sacher":"Trastevere","intrastevere":"Trastevere","reale":"Trastevere","adriano":"Prati","eden":"Prati","giulio cesare":"Prati","azzurro scipioni":"Prati","lux":"Trieste / Salario","odeon":"Trieste / Salario","savoy":"Salario","mignon":"Salario","greenwich":"Testaccio","eurcine":"EUR","atlantic":"Tuscolana","madison":"San Paolo","antares":"Monte Sacro","broadway":"Prenestina","tibur":"San Lorenzo","andromeda":"Termini","caravaggio":"Parioli","maestoso":"Appia","parco de' medici":"Magliana","moderno":"Repubblica","porta di roma":"Bufalotta","roma est":"Lunghezza","romaest":"Lunghezza","maximo":"Laurentina","cineferonia":"Fiano Romano","doria":"Prati","trianon":"Appio"}
+QUALITY_CINEMAS = ["Quattro Fontane","Barberini","Giulio Cesare","Eden","Eurcine","Greenwich","Intrastevere","Mignon","Fiamma","Farnese","Sacher","Troisi","Azzurro Scipioni","Lux","Odeon","Savoy","Tibur","Caravaggio","Adriano","Reale","Atlantic","Madison","Maestoso","Antares","Broadway","Andromeda"]
 GRADS = [("from-[#3a2818] via-[#1c1613] to-[#0a0a0c]","bg-amber-500/20 text-amber-300"),("from-[#162942] via-[#101824] to-[#0a0a0c]","bg-sky-500/20 text-sky-300"),("from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]","bg-rose-500/20 text-rose-300"),("from-[#17332b] via-[#101c19] to-[#0a0a0c]","bg-emerald-500/20 text-emerald-300")]
 PCACHE = {}
 
@@ -22,8 +23,14 @@ def get_poster(title):
                         art = it.get("artworkUrl100", "").replace("100x100bb", "600x600bb")
                         if art: PCACHE[title] = art; return art
             except Exception: pass
-    PCACHE[title] = ""
-    return ""
+        try:
+            w = requests.get("https://it.wikipedia.org/w/api.php", params={"action":"query","generator":"search","gsrsearch":f'"{q}" film',"gsrlimit":3,"prop":"pageimages|extracts","exintro":1,"explaintext":1,"pithumbsize":600,"format":"json"}, headers={"User-Agent":"CineApp/1.0"}, timeout=5).json()
+            for pg in w.get("query", {}).get("pages", {}).values():
+                ext = (pg.get("extract") or "").lower()
+                if "film" in ext and "romanzo" not in ext[:120] and pg.get("thumbnail", {}).get("source"):
+                    PCACHE[title] = pg["thumbnail"]["source"]; return PCACHE[title]
+        except Exception: pass
+    PCACHE[title] = ""; return ""
 
 def norm_cinema(raw):
     n = re.sub(r"\s*[-–|]?\s*Roma$", "", raw, flags=re.I).strip()
@@ -51,7 +58,7 @@ def parse_json(data, today, base_url, out):
         for i in data: parse_json(i, today, base_url, out)
 def run():
     today = datetime.now().strftime("%Y-%m-%d")
-    movies, idx = {}, 1
+    movies, idx, visited = {}, 1, set()
     excl = ["santa marinella","civitavecchia","velletri","tivoli","frascati","albano","anzio","nettuno","pomezia","guidonia","colleferro","bracciano","fiumicino","monterotondo","palestrina","ladispoli","grottaferrata","trevignano","ostia","parco leonardo"]
 
     with sync_playwright() as p:
@@ -62,32 +69,38 @@ def run():
         page.wait_for_timeout(2500)
         page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"],.cdk-overlay-backdrop').forEach(e=>e.remove())")
 
-        cinemas, seen = [], set()
-        for pg in range(1, 8):
+        targets = []
+        for pg in range(1, 10):
             page.mouse.wheel(0, 3000)
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(400)
             names = page.evaluate("""() => [...document.querySelectorAll('h1,h2,h3,h4,h5,strong,[class*="title"],[class*="name"]')].map(e=>(e.innerText||'').trim().split('\\n')[0].trim()).filter(t=>t.length>=4&&t.length<=50&&!t.includes(',')&&!/crea informatica|cookie|privacy|eventi|locali|provincia|tutta italia/i.test(t))""")
             for n in names:
-                if not any(x in n.lower() for x in excl) and norm_cinema(n).lower() not in seen:
-                    seen.add(norm_cinema(n).lower())
-                    cinemas.append((pg, n))
+                if not any(x in n.lower() for x in excl) and norm_cinema(n).lower() not in visited:
+                    visited.add(norm_cinema(n).lower())
+                    targets.append((pg, n, False))
             nxt = page.locator(f"button:has-text('{pg+1}'), a:has-text('{pg+1}')").first
             if nxt.is_visible(timeout=400):
-                nxt.click(force=True)
-                page.wait_for_timeout(1500)
+                nxt.click(force=True); page.wait_for_timeout(1500)
             else: break
 
-        for pg, cname in cinemas:
+        for qc in QUALITY_CINEMAS:
+            if norm_cinema(qc).lower() not in visited:
+                targets.append((1, qc, True))
+
+        print(f"Sale da controllare: {len(targets)}")
+        for pg, cname, via_search in targets:
             try:
-                if page.url != list_url:
-                    page.goto(list_url, wait_until="domcontentloaded", timeout=15000)
-                    page.wait_for_timeout(1500)
-                    page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"]').forEach(e=>e.remove())")
-                for p_i in range(1, pg):
-                    b_pg = page.locator(f"button:has-text('{p_i+1}'), a:has-text('{p_i+1}')").first
-                    if b_pg.is_visible(timeout=400):
-                        b_pg.click(force=True)
-                        page.wait_for_timeout(1000)
+                page.goto(list_url, wait_until="domcontentloaded", timeout=15000)
+                page.wait_for_timeout(1600)
+                page.evaluate("document.querySelectorAll('[class*=\"cookie\"],[id*=\"cookie\"]').forEach(e=>e.remove())")
+                if via_search:
+                    inp = page.locator("input[placeholder*='locale' i], input[placeholder*='cerca' i], input[type='text']").first
+                    if inp.is_visible(timeout=800):
+                        inp.fill(cname); page.wait_for_timeout(1400)
+                else:
+                    for p_i in range(1, pg):
+                        b_pg = page.locator(f"button:has-text('{p_i+1}'), a:has-text('{p_i+1}')").first
+                        if b_pg.is_visible(timeout=400): b_pg.click(force=True); page.wait_for_timeout(1000)
 
                 el = page.get_by_text(cname, exact=False).first
                 if not el.is_visible(timeout=700): continue
@@ -99,8 +112,7 @@ def run():
                 c_url = page.url
                 oggi = page.get_by_text("Oggi", exact=True).first
                 if oggi.is_visible(timeout=800):
-                    oggi.click(force=True, timeout=2000)
-                    page.wait_for_timeout(1500)
+                    oggi.click(force=True, timeout=2000); page.wait_for_timeout(1400)
                 page.remove_listener("response", fn)
 
                 ext = []
@@ -108,20 +120,18 @@ def run():
                 for it in ext:
                     try:
                         if page.url != c_url:
-                            page.goto(c_url, wait_until="domcontentloaded", timeout=10000)
-                            page.wait_for_timeout(1400)
+                            page.goto(c_url, wait_until="domcontentloaded", timeout=10000); page.wait_for_timeout(1200)
                         ev_loc = page.get_by_text(it["raw"], exact=False).first
-                        if not ev_loc.is_visible(timeout=600):
-                            ev_loc = page.get_by_text(norm_title(it["raw"]), exact=False).first
+                        if not ev_loc.is_visible(timeout=600): ev_loc = page.get_by_text(norm_title(it["raw"]), exact=False).first
                         if ev_loc.is_visible(timeout=600):
-                            ev_loc.click(timeout=2500)
-                            page.wait_for_timeout(1800)
+                            ev_loc.click(timeout=2500); page.wait_for_timeout(1800)
                             if page.url != c_url and "all-locals" not in page.url:
                                 it["url"] = page.url
                                 for s in it["st"]: s["url"] = page.url
                     except Exception: pass
 
-                print(f"→ {cname}: {len(ext)} film (link diretti: {sum(1 for x in ext if x['url']!=c_url)})")
+                if ext:
+                    print(f"→ {cname}: {len(ext)} film")
                 for it in ext:
                     ov, nt, nc = is_ov(it["raw"]), norm_title(it["raw"]), norm_cinema(cname)
                     if len(nt) < 3: continue
