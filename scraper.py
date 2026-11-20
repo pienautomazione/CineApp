@@ -55,11 +55,9 @@ def parse_json(data, today, base_url, out):
     if isinstance(data, dict):
         t = next((data[k].strip() for k in ["Title","title","EventName","eventName","MovieTitle","movieTitle","Descrizione","descrizione"] if isinstance(data.get(k), str) and 2 <= len(data[k].strip()) <= 80), "")
         if t:
-            ev_id = next((str(data[k]).strip() for k in ["EventId","eventId","EventCode","eventCode","Code","code","Id","id","IdEvento","idEvento"] if isinstance(data.get(k), (int, str)) and len(str(data[k]).strip()) >= 2), "")
-            url = f"{base_url.split('?')[0].rstrip('/')}/event/{ev_id}" if (ev_id and "/local/" in base_url and "/event/" not in base_url) else base_url
             times = re.findall(rf"{today}[T\s]+([12]\d):([0-5][05])", json.dumps(data))
             if times:
-                out.append({"raw": t, "poster": find_img(data), "url": url, "st": [{"time": f"{h}:{m}", "url": url} for h, m in sorted(set(times))]})
+                out.append({"raw": t, "poster": find_img(data), "url": base_url, "st": [{"time": f"{h}:{m}", "url": base_url} for h, m in sorted(set(times))]})
         for v in data.values():
             parse_json(v, today, base_url, out)
     elif isinstance(data, list):
@@ -119,31 +117,42 @@ def run():
                 oggi = page.get_by_text("Oggi", exact=True).first
                 if oggi.is_visible(timeout=800):
                     oggi.click(force=True, timeout=2000)
-                    page.wait_for_timeout(1400)
+                    page.wait_for_timeout(1500)
                 page.remove_listener("response", fn)
 
                 ext = []
                 for pl in payloads: parse_json(pl, today, c_url, ext)
+
+                # Naviga dentro ciascun film per catturare il suo URL diretto (qualsiasi rotta usi Webtic)
                 for it in ext:
                     try:
-                        href = page.evaluate("""t => { const a = [...document.querySelectorAll('a[href*="/event/"]')].find(x=>(x.innerText||'').toLowerCase().includes(t.toLowerCase())); return a ? a.href : ''; }""", it["raw"])
-                        if href:
-                            it["url"] = href
-                            for s in it["st"]: s["url"] = href
-                        else:
-                            ev = page.get_by_text(it["raw"], exact=False).first
-                            if ev.is_visible(timeout=600):
-                                ev.click(force=True, timeout=2000)
-                                page.wait_for_url("**/event/**", timeout=2500)
-                                if "/event/" in page.url:
-                                    it["url"] = page.url
-                                    for s in it["st"]: s["url"] = page.url
-                                    page.go_back(timeout=3000)
-                                    page.wait_for_timeout(800)
+                        if page.url != c_url:
+                            page.goto(c_url, wait_until="domcontentloaded", timeout=10000)
+                            page.wait_for_timeout(1400)
+                            ob = page.get_by_text("Oggi", exact=True).first
+                            if ob.is_visible(timeout=600):
+                                ob.click(force=True, timeout=1500)
+                                page.wait_for_timeout(1000)
+
+                        # Cerca il titolo esatto o normalizzato nella lista film della pagina
+                        target_title = norm_title(it["raw"])
+                        ev = page.get_by_text(it["raw"], exact=False).first
+                        if not ev.is_visible(timeout=700):
+                            ev = page.get_by_text(target_title, exact=False).first
+
+                        if ev.is_visible(timeout=700):
+                            ev.scroll_into_view_if_needed(timeout=1500)
+                            ev.click(force=True, timeout=2500)
+                            page.wait_for_timeout(1600)
+                            if page.url != c_url and "all-locals" not in page.url:
+                                it["url"] = page.url
+                                for s in it["st"]:
+                                    s["url"] = page.url
                     except Exception:
                         pass
 
-                print(f"→ {cname}: {len(ext)} film")
+                deep_count = sum(1 for x in ext if x["url"] != c_url)
+                print(f"→ {cname}: {len(ext)} film (deep-link diretti: {deep_count})")
                 for it in ext:
                     ov, nt, nc = is_ov(it["raw"]), norm_title(it["raw"]), norm_cinema(cname)
                     if len(nt) < 3: continue
@@ -158,7 +167,9 @@ def run():
                         movies[nt]["screenings"].append({"city": "Roma", "cinema": nc, "zone": get_zone(nc), "isOV": ov, "language": "V.O. · Sub ITA" if ov else "Italiano", "showtimes": it["st"], "times": [x["time"] for x in it["st"]], "bookingUrl": it["url"]})
                     else:
                         m = {x["time"]: x["url"] for x in sc["showtimes"]}
-                        for x in it["st"]: m[x["time"]] = x["url"]
+                        for x in it["st"]:
+                            if x["time"] not in m or m[x["time"]] == c_url:
+                                m[x["time"]] = x["url"]
                         sc["showtimes"] = [{"time": k, "url": v} for k, v in sorted(m.items())]
                         sc["times"] = [x["time"] for x in sc["showtimes"]]
             except Exception:
