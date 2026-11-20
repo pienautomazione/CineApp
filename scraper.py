@@ -16,7 +16,8 @@ ROME_ZONES = {
     "atlantic": "Tuscolana", "madison": "San Paolo", "antares": "Monte Sacro",
     "broadway": "Prenestina", "tibur": "San Lorenzo", "andromeda": "Termini",
     "caravaggio": "Parioli", "maestoso": "Appia", "parco de' medici": "Magliana",
-    "moderno": "Repubblica", "porta di roma": "Bufalotta", "roma est": "Lunghezza"
+    "moderno": "Repubblica", "porta di roma": "Bufalotta", "roma est": "Lunghezza",
+    "cineferonia": "Fiano Romano", "fiano": "Fiano Romano"
 }
 
 GRADIENTS = [
@@ -47,10 +48,10 @@ JS_GET_CINEMA_CARDS = r"""
 }
 """
 
-JS_EXTRACT_CLEAN_DOM = r"""
-() => {
+JS_EXTRACT_SHOWTIMES = r"""
+(fallbackUrl) => {
     const results = [];
-    // Accetta SOLO orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:30, 18:45, 20:15, 22:30)
+    // Solo orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:00, 18:15, 20:30, 22:45)
     const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
     const seen = new Set();
 
@@ -60,27 +61,42 @@ JS_EXTRACT_CLEAN_DOM = r"""
         if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio/i.test(title)) return;
 
         let container = titleEl.parentElement;
-        for (let i = 0; i < 4 && container; i++) {
-            // Legge solo i bottoni/badge cliccabili degli spettacoli
-            const candidates = container.querySelectorAll('button, a, [class*="time"], [class*="orario"], [class*="hour"], [class*="show"]');
-            const times = [];
+        for (let i = 0; i < 5 && container; i++) {
+            // Se il contenitore ha più giorni tabellati, prende solo il primo blocco giorno (Oggi)
+            const dayContainers = container.querySelectorAll('[class*="day"], [class*="date"], [class*="giorno"], [class*="tab-pane"]');
+            const searchScope = dayContainers.length > 0 ? dayContainers[0] : container;
+
+            const candidates = searchScope.querySelectorAll('a, button, [class*="time"], [class*="orario"], [class*="hour"], [class*="show"]');
+            const showtimesMap = new Map();
+
             candidates.forEach(el => {
-                if (el.children.length === 0) {
-                    const txt = (el.innerText || '').trim();
-                    if (validShowtimeRegex.test(txt)) {
-                        times.push(txt);
+                if (el.children.length > 1) return;
+                const txt = (el.innerText || '').trim();
+                if (validShowtimeRegex.test(txt)) {
+                    // Cerca il link diretto al singolo spettacolo (href su el o su un genitore <a>)
+                    const linkEl = el.tagName === 'A' ? el : el.closest('a');
+                    let directUrl = fallbackUrl;
+                    if (linkEl && linkEl.href && linkEl.href.startsWith('http') && !linkEl.href.endsWith('#')) {
+                        directUrl = linkEl.href;
+                    }
+                    if (!showtimesMap.has(txt)) {
+                        showtimesMap.set(txt, directUrl);
                     }
                 }
             });
 
-            if (times.length > 0 && times.length <= 10) {
+            if (showtimesMap.size > 0 && showtimesMap.size <= 9) {
                 let poster = '';
-                const img = container.querySelector('img');
-                if (img && img.src && img.src.startsWith('http') && !/logo|icon|flag|placeholder/i.test(img.src)) {
-                    poster = img.src;
+                const imgs = container.querySelectorAll('img');
+                for (const img of imgs) {
+                    const src = img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '';
+                    if (src && src.startsWith('http') && !/logo|icon|flag|placeholder|avatar/i.test(src)) {
+                        poster = src;
+                        break;
+                    }
                 }
                 if (!poster) {
-                    const bgNodes = container.querySelectorAll('[style*="background-image"]');
+                    const bgNodes = container.querySelectorAll('[style*="background"]');
                     for (const n of bgNodes) {
                         const m = (n.style.backgroundImage || '').match(/url\(["']?(https?:\/\/[^"')]+)["']?\)/);
                         if (m && !/logo|icon|flag|placeholder/i.test(m[1])) {
@@ -90,12 +106,12 @@ JS_EXTRACT_CLEAN_DOM = r"""
                     }
                 }
 
+                const showtimes = Array.from(showtimesMap.entries())
+                    .map(([time, url]) => ({ time, url }))
+                    .sort((a, b) => a.time.localeCompare(b.time));
+
                 seen.add(title.toLowerCase());
-                results.push({
-                    title: title,
-                    times: [...new Set(times)].sort(),
-                    poster: poster
-                });
+                results.push({ title, showtimes, poster });
                 break;
             }
             container = container.parentElement;
@@ -109,26 +125,33 @@ def fetch_hd_poster(title: str) -> str:
     if title in POSTER_CACHE:
         return POSTER_CACHE[title]
     search_term = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", title).strip()
-    try:
-        r = requests.get(
-            "https://itunes.apple.com/search",
-            params={"term": search_term, "media": "movie", "country": "it", "limit": 3},
-            timeout=6
-        )
-        if r.status_code == 200:
-            results = r.json().get("results", [])
-            for item in results:
-                track = (item.get("trackName") or "").lower()
-                if search_term.lower() in track or track in search_term.lower() or len(results) == 1:
-                    art = item.get("artworkUrl100", "")
-                    if art:
-                        hd_art = art.replace("100x100bb", "600x600bb")
-                        POSTER_CACHE[title] = hd_art
-                        return hd_art
-    except Exception:
-        pass
+    for country in ["it", "us"]:
+        try:
+            r = requests.get(
+                "https://itunes.apple.com/search",
+                params={"term": search_term, "media": "movie", "country": country, "limit": 5},
+                timeout=6
+            )
+            if r.status_code == 200:
+                results = r.json().get("results", [])
+                for item in results:
+                    track = (item.get("trackName") or "").lower()
+                    if search_term.lower() in track or track in search_term.lower() or len(results) == 1:
+                        art = item.get("artworkUrl100", "")
+                        if art:
+                            hd_art = art.replace("100x100bb", "600x600bb")
+                            POSTER_CACHE[title] = hd_art
+                            return hd_art
+        except Exception:
+            pass
     POSTER_CACHE[title] = ""
     return ""
+
+def normalize_cinema_name(raw_name: str) -> str:
+    """Uniforma il nome del cinema per evitare duplicati (es. 'Cinema Atlantic' e 'Atlantic')."""
+    name = re.sub(r"\s*[-–|]?\s*Roma$", "", raw_name, flags=re.I).strip()
+    name = re.sub(r"^(?:Multisala|Nuovo\s+Cinema|Cinema)\s+", "", name, flags=re.I).strip()
+    return name.title() if name else raw_name.strip()
 
 def detect_zone(cinema_name: str) -> str:
     lower = cinema_name.lower()
@@ -151,26 +174,17 @@ def normalize_title(raw: str) -> str:
     cleaned = re.sub(r"^[\(\)\[\]\-\–\:\.\s]+", "", cleaned)
     return " ".join(cleaned.split()).strip().title()
 
-def filter_round_times(times: list) -> list:
-    """Mantiene solo orari cinema reali (10:00-23:55 con minuti multipli di 5, es. :00, :15, :30, :45)."""
-    valid = []
-    for t in dict.fromkeys(times):
-        m = re.match(r"^([12]\d):([0-5][05])$", t.strip())
-        if m:
-            valid.append(t.strip())
-    return sorted(valid)
-
 def scrape_all_rome():
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta pulita cinema Roma...")
+    today_day = str(datetime.now().day)
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Avvio raccolta pulita cinema Roma (giorno {today_day})...")
     movies_dict = {}
     counter = 1
 
-    def add_screening(raw_title: str, cinema_name: str, times: list, booking_url: str, poster: str = ""):
+    def add_screening(raw_title: str, cinema_name: str, showtimes: list, fallback_url: str, poster: str = ""):
         nonlocal counter
-        cleaned_times = filter_round_times(times)
         is_ov = detect_original_version(raw_title)
         norm_title = normalize_title(raw_title)
-        if not norm_title or len(norm_title) < 3 or not cleaned_times:
+        if not norm_title or len(norm_title) < 3 or not showtimes:
             return
 
         if not poster:
@@ -199,11 +213,13 @@ def scrape_all_rome():
             if is_ov:
                 movies_dict[norm_title]["hasOV"] = True
 
-        clean_c_name = re.sub(r"\s*[-–|]?\s*Roma$", "", cinema_name, flags=re.I).strip()
+        clean_c_name = normalize_cinema_name(cinema_name)
         lang_label = "V.O. · Sub ITA" if is_ov else "ITA"
 
+        # Deduplica rigorosa per (cinema normalizzato + lingua)
         existing = next(
-            (s for s in movies_dict[norm_title]["screenings"] if s["cinema"] == clean_c_name and s.get("isOV", False) == is_ov),
+            (s for s in movies_dict[norm_title]["screenings"]
+             if s["cinema"].lower() == clean_c_name.lower() and s.get("isOV", False) == is_ov),
             None
         )
         if not existing:
@@ -213,11 +229,18 @@ def scrape_all_rome():
                 "zone": detect_zone(clean_c_name),
                 "isOV": is_ov,
                 "language": lang_label,
-                "times": cleaned_times,
-                "bookingUrl": booking_url
+                "showtimes": showtimes,
+                "times": [st["time"] for st in showtimes],
+                "bookingUrl": fallback_url
             })
         else:
-            existing["times"] = filter_round_times(existing["times"] + cleaned_times)
+            merged = {st["time"]: st["url"] for st in existing.get("showtimes", [])}
+            for st in showtimes:
+                if st["time"] not in merged or merged[st["time"]] == fallback_url:
+                    merged[st["time"]] = st["url"]
+            sorted_st = [{"time": t, "url": u} for t, u in sorted(merged.items())]
+            existing["showtimes"] = sorted_st
+            existing["times"] = [st["time"] for st in sorted_st]
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -261,8 +284,9 @@ def scrape_all_rome():
                 low = name.lower()
                 if any(t in low for t in excluded_towns):
                     continue
-                if low not in seen_cinemas:
-                    seen_cinemas.add(low)
+                norm_c = normalize_cinema_name(name).lower()
+                if norm_c not in seen_cinemas:
+                    seen_cinemas.add(norm_c)
                     all_cinema_names.append((page_num, name))
 
             next_clicked = False
@@ -279,7 +303,7 @@ def scrape_all_rome():
             if not next_clicked:
                 break
 
-        print(f"Trovati {len(all_cinema_names)} cinema a Roma: {[c[1] for c in all_cinema_names]}")
+        print(f"Trovati {len(all_cinema_names)} cinema unici: {[c[1] for c in all_cinema_names]}")
 
         for target_page, cinema_name in all_cinema_names:
             try:
@@ -306,13 +330,24 @@ def scrape_all_rome():
 
                 cinema_el.click()
                 page.wait_for_timeout(3200)
-                booking_url = page.url
+                cinema_url = page.url
 
-                extracted = page.evaluate(JS_EXTRACT_CLEAN_DOM)
+                # Seleziona esplicitamente la tab "Oggi" / giorno corrente se presente
+                for today_sel in ["button:has-text('Oggi')", "a:has-text('Oggi')", f"button:has-text('{today_day}/')"]:
+                    try:
+                        t_btn = page.locator(today_sel).first
+                        if t_btn.is_visible(timeout=400):
+                            t_btn.click()
+                            page.wait_for_timeout(1000)
+                            break
+                    except Exception:
+                        pass
+
+                extracted = page.evaluate(JS_EXTRACT_SHOWTIMES, cinema_url)
                 print(f"→ {cinema_name}: {len(extracted)} film")
 
                 for it in extracted:
-                    add_screening(it["title"], cinema_name, it["times"], booking_url, it.get("poster", ""))
+                    add_screening(it["title"], cinema_name, it["showtimes"], cinema_url, it.get("poster", ""))
 
             except Exception as e:
                 print(f"  Errore su {cinema_name}: {e}")
