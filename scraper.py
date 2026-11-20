@@ -1,10 +1,29 @@
-import json, re
+import json, re, requests
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 
 OUTPUT_FILE = "movies.json"
 ZONES = {"barberini":"Centro","quattro fontane":"Centro","farnese":"Campo de' Fiori","fiamma":"Centro","troisi":"Trastevere","sacher":"Trastevere","intrastevere":"Trastevere","reale":"Trastevere","adriano":"Prati","eden":"Prati","giulio cesare":"Prati","azzurro scipioni":"Prati","lux":"Trieste / Salario","odeon":"Trieste / Salario","savoy":"Salario","mignon":"Salario","greenwich":"Testaccio","eurcine":"EUR","atlantic":"Tuscolana","madison":"San Paolo","antares":"Monte Sacro","broadway":"Prenestina","tibur":"San Lorenzo","andromeda":"Termini","caravaggio":"Parioli","maestoso":"Appia","parco de' medici":"Magliana","moderno":"Repubblica","porta di roma":"Bufalotta","roma est":"Lunghezza","romaest":"Lunghezza","maximo":"Laurentina","cineferonia":"Fiano Romano","doria":"Prati","trianon":"Appio"}
 GRADS = [("from-[#3a2818] via-[#1c1613] to-[#0a0a0c]","bg-amber-500/20 text-amber-300"),("from-[#162942] via-[#101824] to-[#0a0a0c]","bg-sky-500/20 text-sky-300"),("from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]","bg-rose-500/20 text-rose-300"),("from-[#17332b] via-[#101c19] to-[#0a0a0c]","bg-emerald-500/20 text-emerald-300")]
+PCACHE = {}
+
+def get_poster(title):
+    if title in PCACHE: return PCACHE[title]
+    clean = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", title).strip()
+    short = re.split(r"\s*[-–:]\s*", clean)[0].strip()
+    for q in dict.fromkeys([clean, short]):
+        if len(q) < 3: continue
+        for c in ["it", "us"]:
+            try:
+                r = requests.get("https://itunes.apple.com/search", params={"term": q, "media": "movie", "country": c, "limit": 5}, timeout=5).json()
+                for it in r.get("results", []):
+                    tn = (it.get("trackName") or "").lower()
+                    if q.lower() in tn or tn in q.lower():
+                        art = it.get("artworkUrl100", "").replace("100x100bb", "600x600bb")
+                        if art: PCACHE[title] = art; return art
+            except Exception: pass
+    PCACHE[title] = ""
+    return ""
 
 def norm_cinema(raw):
     n = re.sub(r"\s*[-–|]?\s*Roma$", "", raw, flags=re.I).strip()
@@ -26,7 +45,7 @@ def parse_json(data, today, base_url, out):
         if t:
             times = re.findall(rf"{today}[T\s]+([12]\d):([0-5][05])", json.dumps(data))
             if times:
-                out.append({"raw": t, "poster": "", "url": base_url, "st": [{"time": f"{h}:{m}", "url": base_url} for h, m in sorted(set(times))]})
+                out.append({"raw": t, "url": base_url, "st": [{"time": f"{h}:{m}", "url": base_url} for h, m in sorted(set(times))]})
         for v in data.values(): parse_json(v, today, base_url, out)
     elif isinstance(data, list):
         for i in data: parse_json(i, today, base_url, out)
@@ -84,41 +103,39 @@ def run():
                     page.wait_for_timeout(1500)
                 page.remove_listener("response", fn)
 
-                dom_imgs = page.evaluate("""() => {
-                    const out = [];
-                    document.querySelectorAll('img').forEach(i => {
-                        const src = i.currentSrc || i.src || '';
-                        if (!src.startsWith('http') || /logo|icon|flag|sprite/i.test(src)) return;
-                        let box = i;
-                        for (let k = 0; k < 4 && box.parentElement; k++) box = box.parentElement;
-                        out.push({ src, txt: (box.innerText || '').toLowerCase() });
-                    });
-                    return out;
-                }""")
-
                 ext = []
                 for pl in payloads: parse_json(pl, today, c_url, ext)
                 for it in ext:
-                    nt_low = norm_title(it["raw"]).lower()
-                    hit_img = next((d["src"] for d in dom_imgs if nt_low in d["txt"]), "")
-                    if hit_img: it["poster"] = hit_img
+                    try:
+                        if page.url != c_url:
+                            page.goto(c_url, wait_until="domcontentloaded", timeout=10000)
+                            page.wait_for_timeout(1400)
+                        ev_loc = page.get_by_text(it["raw"], exact=False).first
+                        if not ev_loc.is_visible(timeout=600):
+                            ev_loc = page.get_by_text(norm_title(it["raw"]), exact=False).first
+                        if ev_loc.is_visible(timeout=600):
+                            ev_loc.click(timeout=2500)
+                            page.wait_for_timeout(1800)
+                            if page.url != c_url and "all-locals" not in page.url:
+                                it["url"] = page.url
+                                for s in it["st"]: s["url"] = page.url
+                    except Exception: pass
 
-                print(f"→ {cname}: {len(ext)} film (locandine: {sum(1 for x in ext if x['poster'])})")
+                print(f"→ {cname}: {len(ext)} film (link diretti: {sum(1 for x in ext if x['url']!=c_url)})")
                 for it in ext:
                     ov, nt, nc = is_ov(it["raw"]), norm_title(it["raw"]), norm_cinema(cname)
                     if len(nt) < 3: continue
                     if nt not in movies:
                         g, a = GRADS[(idx-1) % len(GRADS)]
-                        movies[nt] = {"id": idx, "title": nt, "genre": "In Sala · Oggi", "duration": "Oggi", "rating": "★", "posterUrl": it["poster"], "gradient": g, "accent": a, "tag": "ROMA", "hasOV": ov, "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.", "screenings": []}
+                        movies[nt] = {"id": idx, "title": nt, "genre": "In Sala · Oggi", "duration": "Oggi", "rating": "★", "posterUrl": get_poster(nt), "gradient": g, "accent": a, "tag": "ROMA", "hasOV": ov, "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.", "screenings": []}
                         idx += 1
-                    elif not movies[nt]["posterUrl"] and it["poster"]:
-                        movies[nt]["posterUrl"] = it["poster"]
                     sc = next((s for s in movies[nt]["screenings"] if s["cinema"].lower()==nc.lower() and s["isOV"]==ov), None)
                     if not sc:
                         movies[nt]["screenings"].append({"city": "Roma", "cinema": nc, "zone": get_zone(nc), "isOV": ov, "language": "V.O. · Sub ITA" if ov else "Italiano", "showtimes": it["st"], "times": [x["time"] for x in it["st"]], "bookingUrl": it["url"]})
                     else:
                         m = {x["time"]: x["url"] for x in sc["showtimes"]}
-                        for x in it["st"]: m[x["time"]] = x["url"]
+                        for x in it["st"]:
+                            if x["time"] not in m or m[x["time"]] == c_url: m[x["time"]] = x["url"]
                         sc["showtimes"] = [{"time": k, "url": v} for k, v in sorted(m.items())]
                         sc["times"] = [x["time"] for x in sc["showtimes"]]
             except Exception: pass
@@ -128,7 +145,7 @@ def run():
     if res:
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             json.dump(res, f, ensure_ascii=False, indent=2)
-        print(f"✅ Salvati {len(res)} film.")
+        print(f"✅ Salvati {len(res)} film (con locandina: {sum(1 for m in res if m['posterUrl'])}).")
 
 if __name__ == "__main__":
     run()
