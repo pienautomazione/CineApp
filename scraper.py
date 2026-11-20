@@ -17,7 +17,7 @@ ROME_ZONES = {
     "broadway": "Prenestina", "tibur": "San Lorenzo", "andromeda": "Termini",
     "caravaggio": "Parioli", "maestoso": "Appia", "parco de' medici": "Magliana",
     "moderno": "Repubblica", "porta di roma": "Bufalotta", "roma est": "Lunghezza",
-    "cineferonia": "Fiano Romano", "fiano": "Fiano Romano"
+    "cineferonia": "Fiano Romano"
 }
 
 GRADIENTS = [
@@ -51,7 +51,6 @@ JS_GET_CINEMA_CARDS = r"""
 JS_EXTRACT_SHOWTIMES = r"""
 (fallbackUrl) => {
     const results = [];
-    // Solo orari reali di inizio spettacolo con minuti multipli di 5 (es. 16:00, 18:15, 20:30, 22:45)
     const validShowtimeRegex = /^([12]\d):([0-5][05])$/;
     const seen = new Set();
 
@@ -61,8 +60,7 @@ JS_EXTRACT_SHOWTIMES = r"""
         if (/webtic|carrello|accedi|privacy|cookie|seleziona|acquista|bigliett|oggi|domani|luned|marted|mercoled|gioved|venerd|sabat|domenic|cerca|eventi|locali|crea informatica|provincia|roma|lazio/i.test(title)) return;
 
         let container = titleEl.parentElement;
-        for (let i = 0; i < 5 && container; i++) {
-            // Se il contenitore ha più giorni tabellati, prende solo il primo blocco giorno (Oggi)
+        for (let i = 0; i < 6 && container; i++) {
             const dayContainers = container.querySelectorAll('[class*="day"], [class*="date"], [class*="giorno"], [class*="tab-pane"]');
             const searchScope = dayContainers.length > 0 ? dayContainers[0] : container;
 
@@ -73,7 +71,6 @@ JS_EXTRACT_SHOWTIMES = r"""
                 if (el.children.length > 1) return;
                 const txt = (el.innerText || '').trim();
                 if (validShowtimeRegex.test(txt)) {
-                    // Cerca il link diretto al singolo spettacolo (href su el o su un genitore <a>)
                     const linkEl = el.tagName === 'A' ? el : el.closest('a');
                     let directUrl = fallbackUrl;
                     if (linkEl && linkEl.href && linkEl.href.startsWith('http') && !linkEl.href.endsWith('#')) {
@@ -89,17 +86,18 @@ JS_EXTRACT_SHOWTIMES = r"""
                 let poster = '';
                 const imgs = container.querySelectorAll('img');
                 for (const img of imgs) {
-                    const src = img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '';
-                    if (src && src.startsWith('http') && !/logo|icon|flag|placeholder|avatar/i.test(src)) {
+                    const src = img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('ng-src') || '';
+                    if (src && src.startsWith('http') && !/logo|icon|flag|placeholder|avatar|sprite/i.test(src)) {
                         poster = src;
                         break;
                     }
                 }
                 if (!poster) {
-                    const bgNodes = container.querySelectorAll('[style*="background"]');
-                    for (const n of bgNodes) {
-                        const m = (n.style.backgroundImage || '').match(/url\(["']?(https?:\/\/[^"')]+)["']?\)/);
-                        if (m && !/logo|icon|flag|placeholder/i.test(m[1])) {
+                    const allNodes = container.querySelectorAll('*');
+                    for (const n of allNodes) {
+                        const bg = window.getComputedStyle(n).backgroundImage || '';
+                        const m = bg.match(/url\(["']?(https?:\/\/[^"')]+)["']?\)/);
+                        if (m && !/logo|icon|flag|placeholder|avatar|sprite/i.test(m[1])) {
                             poster = m[1];
                             break;
                         }
@@ -125,12 +123,14 @@ def fetch_hd_poster(title: str) -> str:
     if title in POSTER_CACHE:
         return POSTER_CACHE[title]
     search_term = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", title).strip()
+
+    # 1. Prova iTunes Store (IT e US)
     for country in ["it", "us"]:
         try:
             r = requests.get(
                 "https://itunes.apple.com/search",
                 params={"term": search_term, "media": "movie", "country": country, "limit": 5},
-                timeout=6
+                timeout=5
             )
             if r.status_code == 200:
                 results = r.json().get("results", [])
@@ -144,13 +144,41 @@ def fetch_hd_poster(title: str) -> str:
                             return hd_art
         except Exception:
             pass
+
+    # 2. Fallback Wikipedia IT (ottimo per film italiani recenti usciti in sala)
+    try:
+        r = requests.get(
+            "https://it.wikipedia.org/w/api.php",
+            params={
+                "action": "query",
+                "generator": "search",
+                "gsrsearch": f"{search_term} film",
+                "gsrlimit": 2,
+                "prop": "pageimages",
+                "pithumbsize": 600,
+                "format": "json"
+            },
+            headers={"User-Agent": "CineApp/1.0"},
+            timeout=5
+        )
+        if r.status_code == 200:
+            pages = r.json().get("query", {}).get("pages", {})
+            for p_data in pages.values():
+                thumb = p_data.get("thumbnail", {}).get("source", "")
+                if thumb and thumb.startswith("http"):
+                    POSTER_CACHE[title] = thumb
+                    return thumb
+    except Exception:
+        pass
+
     POSTER_CACHE[title] = ""
     return ""
 
 def normalize_cinema_name(raw_name: str) -> str:
-    """Uniforma il nome del cinema per evitare duplicati (es. 'Cinema Atlantic' e 'Atlantic')."""
     name = re.sub(r"\s*[-–|]?\s*Roma$", "", raw_name, flags=re.I).strip()
     name = re.sub(r"^(?:Multisala|Nuovo\s+Cinema|Cinema)\s+", "", name, flags=re.I).strip()
+    if "cineferonia" in name.lower() or "fiano romano" in name.lower():
+        return "Cineferonia"
     return name.title() if name else raw_name.strip()
 
 def detect_zone(cinema_name: str) -> str:
@@ -214,9 +242,8 @@ def scrape_all_rome():
                 movies_dict[norm_title]["hasOV"] = True
 
         clean_c_name = normalize_cinema_name(cinema_name)
-        lang_label = "V.O. · Sub ITA" if is_ov else "ITA"
+        lang_label = "V.O. · Sub ITA" if is_ov else "Lingua Italiana"
 
-        # Deduplica rigorosa per (cinema normalizzato + lingua)
         existing = next(
             (s for s in movies_dict[norm_title]["screenings"]
              if s["cinema"].lower() == clean_c_name.lower() and s.get("isOV", False) == is_ov),
@@ -332,7 +359,6 @@ def scrape_all_rome():
                 page.wait_for_timeout(3200)
                 cinema_url = page.url
 
-                # Seleziona esplicitamente la tab "Oggi" / giorno corrente se presente
                 for today_sel in ["button:has-text('Oggi')", "a:has-text('Oggi')", f"button:has-text('{today_day}/')"]:
                     try:
                         t_btn = page.locator(today_sel).first
@@ -344,7 +370,7 @@ def scrape_all_rome():
                         pass
 
                 extracted = page.evaluate(JS_EXTRACT_SHOWTIMES, cinema_url)
-                print(f"→ {cinema_name}: {len(extracted)} film")
+                print(f"→ {cinema_name}: {len(extracted)} film (con locandine: {sum(1 for x in extracted if x.get('poster'))})")
 
                 for it in extracted:
                     add_screening(it["title"], cinema_name, it["showtimes"], cinema_url, it.get("poster", ""))
