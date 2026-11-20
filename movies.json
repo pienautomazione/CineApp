@@ -65,23 +65,6 @@
       },
       {
         "city": "Roma",
-        "cinema": "Cinemancini",
-        "zone": "Roma",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:40",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-          }
-        ],
-        "times": [
-          "19:40"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-      },
-      {
-        "city": "Roma",
         "cinema": "Doria",
         "zone": "Prati",
         "isOV": false,
@@ -147,23 +130,6 @@
           "20:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Romaest",
-        "zone": "Lunghezza",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:40",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          }
-        ],
-        "times": [
-          "19:40"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
@@ -727,6 +693,28 @@
       },
       {
         "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "23:05",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:10",
+          "23:05"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+      },
+      {
+        "city": "Roma",
         "cinema": "Madison Cinemas",
         "zone": "San Paolo",
         "isOV": false,
@@ -1043,6 +1031,23 @@
       },
       {
         "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+      },
+      {
+        "city": "Roma",
         "cinema": "Madison Cinemas",
         "zone": "San Paolo",
         "isOV": false,
@@ -1100,10 +1105,6 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:40",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
             "time": "21:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
@@ -1117,7 +1118,6 @@
           }
         ],
         "times": [
-          "19:40",
           "21:20",
           "21:50",
           "22:20"
@@ -1132,10 +1132,6 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:40",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          },
-          {
             "time": "21:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
@@ -1145,7 +1141,6 @@
           }
         ],
         "times": [
-          "19:40",
           "21:30",
           "22:20"
         ],
@@ -1758,28 +1753,6 @@
       },
       {
         "city": "Roma",
-        "cinema": "Cinemancini",
-        "zone": "Roma",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:45",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-          },
-          {
-            "time": "21:45",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-          }
-        ],
-        "times": [
-          "19:45",
-          "21:45"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-      },
-      {
-        "city": "Roma",
         "cinema": "Fce Cinema Majestic",
         "zone": "Roma",
         "isOV": true,
@@ -1799,6 +1772,28 @@
           "23:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "23:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:10",
+          "23:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
