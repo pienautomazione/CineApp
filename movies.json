@@ -5,7 +5,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/f/f8/Dio_ride_%28film%29.png/960px-Dio_ride_%28film%29.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
@@ -130,6 +130,23 @@
           "20:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Sacher",
+        "zone": "Trastevere",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "20:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
+          }
+        ],
+        "times": [
+          "20:45"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
       }
     ]
   },
@@ -222,7 +239,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/GodzillaMinusZerologo.png/960px-GodzillaMinusZerologo.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
@@ -332,7 +349,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
@@ -516,6 +533,23 @@
           "23:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Odeon",
+        "zone": "Trieste / Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/BI/5609"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/BI/5609"
       }
     ]
   },
@@ -831,7 +865,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://upload.wikimedia.org/wikipedia/it/f/ff/Estranea_Strippoli.jpeg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -907,7 +941,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/e/e5/Scrooge_e_gli_spiriti_del_Natale.png/960px-Scrooge_e_gli_spiriti_del_Natale.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
@@ -1132,7 +1166,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/3/3a/Se_domani_non_torno_%28film%29.png/960px-Se_domani_non_torno_%28film%29.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
@@ -1664,6 +1698,23 @@
           "23:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Reale",
+        "zone": "Trastevere",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/CT/5622"
+          }
+        ],
+        "times": [
+          "21:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/CT/5622"
       }
     ]
   },
@@ -1769,7 +1820,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -1921,7 +1972,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
@@ -1958,7 +2009,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Francis_Lawrence_by_Gage_Skidmore_2.jpg/960px-Francis_Lawrence_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -1998,6 +2049,38 @@
           "21:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "title": "Look Back",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Dont_Look_Back_-_Bob_Dylan_%281967_film_poster%29.jpg/960px-Dont_Look_Back_-_Bob_Dylan_%281967_film_poster%29.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per scegliere il posto.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Mignon",
+        "zone": "Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/MN/5512"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/MN/5512"
       }
     ]
   }
