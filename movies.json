@@ -5,7 +5,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/f/f8/Dio_ride_%28film%29.png/960px-Dio_ride_%28film%29.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
@@ -178,7 +178,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/d/d0/Fjord_%28film%29.scene.jpg/960px-Fjord_%28film%29.scene.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -261,7 +261,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/4/4c/GodzillaMinusOnescena.png/960px-GodzillaMinusOnescena.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
@@ -371,7 +371,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/3/3c/Hunger_Games_L%27Alba_sulla_Mietitura_Screenshot.jpg/960px-Hunger_Games_L%27Alba_sulla_Mietitura_Screenshot.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
@@ -606,14 +606,6 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:20",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
-          },
-          {
-            "time": "21:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
-          },
-          {
             "time": "21:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
           },
@@ -623,8 +615,6 @@
           }
         ],
         "times": [
-          "19:20",
-          "21:15",
           "21:30",
           "23:25"
         ],
@@ -742,6 +732,28 @@
       },
       {
         "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "23:05",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:10",
+          "23:05"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+      },
+      {
+        "city": "Roma",
         "cinema": "Madison Cinemas",
         "zone": "San Paolo",
         "isOV": false,
@@ -829,14 +841,6 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:20",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "21:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
             "time": "21:50",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
@@ -846,8 +850,6 @@
           }
         ],
         "times": [
-          "19:20",
-          "21:15",
           "21:50",
           "23:45"
         ],
@@ -915,7 +917,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/7/79/AllOfUsSrtrangers.webp/960px-AllOfUsSrtrangers.webp?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
@@ -1001,7 +1003,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Charles_Dickens-A_Christmas_Carol-Title_page-First_edition_1843.jpg/960px-Charles_Dickens-A_Christmas_Carol-Title_page-First_edition_1843.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -1085,6 +1087,23 @@
           "22:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
@@ -1227,191 +1246,13 @@
   },
   {
     "id": 8,
-    "title": "Se Domani Non Torno",
-    "genre": "In Sala · Oggi",
-    "duration": "Programmazione odierna",
-    "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per aprire la scheda spettacolo e scegliere il posto.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Atlantic",
-        "zone": "Tuscolana",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5305"
-          }
-        ],
-        "times": [
-          "19:15"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5305"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Broadway",
-        "zone": "Prenestina",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
-          }
-        ],
-        "times": [
-          "21:00"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Cineferonia",
-        "zone": "Fiano Romano",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "20:20",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
-          },
-          {
-            "time": "22:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
-          }
-        ],
-        "times": [
-          "20:20",
-          "22:30"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Adriano",
-        "zone": "Prati",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
-          }
-        ],
-        "times": [
-          "21:30"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Madison Cinemas",
-        "zone": "San Paolo",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-          },
-          {
-            "time": "21:35",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-          }
-        ],
-        "times": [
-          "19:30",
-          "21:35"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Savoy",
-        "zone": "Salario",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
-          }
-        ],
-        "times": [
-          "21:15"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Trianon",
-        "zone": "Appio",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "22:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-          }
-        ],
-        "times": [
-          "22:00"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Porta Di Roma",
-        "zone": "Bufalotta",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "20:50",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          }
-        ],
-        "times": [
-          "20:50"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Romaest",
-        "zone": "Lunghezza",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "20:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          }
-        ],
-        "times": [
-          "20:30"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-      }
-    ]
-  },
-  {
-    "id": 9,
     "title": "Un Weekend Artificiale",
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Leonardo_Pieraccioni_cropped.jpg/960px-Leonardo_Pieraccioni_cropped.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per aprire la scheda spettacolo e scegliere il posto.",
@@ -1583,14 +1424,14 @@
     ]
   },
   {
-    "id": 10,
+    "id": 9,
     "title": "Puan - Il Professore",
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#2c1d42] via-[#181224] to-[#0a0a0c]",
-    "accent": "bg-purple-500/20 text-purple-300",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": true,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per aprire la scheda spettacolo e scegliere il posto.",
@@ -1611,6 +1452,167 @@
           "21:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Se Domani Non Torno",
+    "genre": "In Sala · Oggi",
+    "duration": "Programmazione odierna",
+    "rating": "★",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/d/d5/Karate_Kid.jpg/960px-Karate_Kid.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "gradient": "from-[#2c1d42] via-[#181224] to-[#0a0a0c]",
+    "accent": "bg-purple-500/20 text-purple-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per aprire la scheda spettacolo e scegliere il posto.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Broadway",
+        "zone": "Prenestina",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5307"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Cineferonia",
+        "zone": "Fiano Romano",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "20:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
+          },
+          {
+            "time": "22:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
+          }
+        ],
+        "times": [
+          "20:20",
+          "22:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Adriano",
+        "zone": "Prati",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          }
+        ],
+        "times": [
+          "21:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Cinemas",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "19:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "21:35",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          }
+        ],
+        "times": [
+          "19:30",
+          "21:35"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Savoy",
+        "zone": "Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
+          }
+        ],
+        "times": [
+          "21:15"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Trianon",
+        "zone": "Appio",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "22:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
+          }
+        ],
+        "times": [
+          "22:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5279"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Porta Di Roma",
+        "zone": "Bufalotta",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "20:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          }
+        ],
+        "times": [
+          "20:50"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "20:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "20:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
@@ -1686,7 +1688,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Kurt_Russell_by_Gage_Skidmore_2.jpg/960px-Kurt_Russell_by_Gage_Skidmore_2.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -1789,7 +1791,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://upload.wikimedia.org/wikipedia/it/d/d7/Funeral_Party.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
@@ -1877,7 +1879,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Martin_McDonagh_at_83rd_Venice_International_Film_Festival-7_%28cropped%29.jpg/960px-Martin_McDonagh_at_83rd_Venice_International_Film_Festival-7_%28cropped%29.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
@@ -1957,6 +1959,28 @@
       },
       {
         "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "23:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:10",
+          "23:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+      },
+      {
+        "city": "Roma",
         "cinema": "Madison Cinemas",
         "zone": "San Paolo",
         "isOV": false,
@@ -2017,7 +2041,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/8/88/Digger_%28film_2026%29.jpg/960px-Digger_%28film_2026%29.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#2c1d42] via-[#181224] to-[#0a0a0c]",
     "accent": "bg-purple-500/20 text-purple-300",
     "tag": "ROMA",
@@ -2049,7 +2073,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/0/0e/Look_Back.jpeg/960px-Look_Back.jpeg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
@@ -2081,7 +2105,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Angela_Basset_at_the_2025_Cannes_Film_Festival_04_%28cropped%29.jpg/960px-Angela_Basset_at_the_2025_Cannes_Film_Festival_04_%28cropped%29.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
@@ -2113,7 +2137,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/e/e2/Shaun%2C_vita_da_pecora_-_Operazione_Z.U.C.C.A..jpg/960px-Shaun%2C_vita_da_pecora_-_Operazione_Z.U.C.C.A..jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
     "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
@@ -2145,7 +2169,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://thumb.wikimedia.org/wikipedia/it/thumb/3/3c/Hunger_Games_L%27Alba_sulla_Mietitura_Screenshot.jpg/960px-Hunger_Games_L%27Alba_sulla_Mietitura_Screenshot.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
     "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
@@ -2192,16 +2216,11 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
             "time": "22:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "19:10",
           "22:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
@@ -2253,7 +2272,7 @@
     "genre": "In Sala · Oggi",
     "duration": "Programmazione odierna",
     "rating": "★",
-    "posterUrl": "",
+    "posterUrl": "https://upload.wikimedia.org/wikipedia/it/5/54/Clayface_%28Xerm%C3%A1nico%29.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
