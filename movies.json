@@ -98,12 +98,12 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "21:30",
+            "time": "19:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
           }
         ],
         "times": [
-          "21:30"
+          "19:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
       },
@@ -126,6 +126,23 @@
       },
       {
         "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "15:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "15:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+      },
+      {
+        "city": "Roma",
         "cinema": "Madison Cinemas",
         "zone": "San Paolo",
         "isOV": false,
@@ -142,12 +159,17 @@
           {
             "time": "19:25",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "21:35",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
           }
         ],
         "times": [
           "15:05",
           "17:15",
-          "19:25"
+          "19:25",
+          "21:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
       },
@@ -159,17 +181,12 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
-          },
-          {
-            "time": "18:15",
+            "time": "20:45",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
           }
         ],
         "times": [
-          "16:00",
-          "18:15"
+          "20:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
       },
@@ -375,61 +392,76 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "15:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+          },
+          {
             "time": "17:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
           },
           {
-            "time": "19:20",
+            "time": "19:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+          },
+          {
+            "time": "21:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+          },
+          {
+            "time": "22:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
           }
         ],
         "times": [
+          "15:20",
           "17:20",
-          "19:20"
+          "19:50",
+          "21:50",
+          "22:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
       },
       {
         "city": "Roma",
-        "cinema": "Madison Cinemas",
+        "cinema": "Madison Al Fellini",
         "zone": "San Paolo",
         "isOV": false,
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "17:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+            "time": "17:05",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
           },
           {
-            "time": "19:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+            "time": "19:05",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
           },
           {
-            "time": "19:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+            "time": "19:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
           },
           {
             "time": "21:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
           },
           {
-            "time": "21:35",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-          },
-          {
-            "time": "23:35",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+            "time": "23:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
           }
         ],
         "times": [
-          "17:00",
-          "19:00",
-          "19:15",
+          "17:05",
+          "19:05",
+          "19:10",
+          "21:10",
           "21:15",
-          "21:35",
-          "23:35"
+          "23:15"
         ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
@@ -673,12 +705,17 @@
           {
             "time": "21:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5305"
+          },
+          {
+            "time": "22:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5305"
           }
         ],
         "times": [
           "15:00",
           "18:00",
-          "21:00"
+          "21:00",
+          "22:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5305"
       },
@@ -744,12 +781,17 @@
           {
             "time": "21:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
           "15:00",
           "18:00",
-          "21:00"
+          "21:00",
+          "22:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
       },
@@ -761,12 +803,12 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "17:15",
+            "time": "20:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
           }
         ],
         "times": [
-          "17:15"
+          "20:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
       },
@@ -849,6 +891,14 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "10:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "14:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
             "time": "15:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
@@ -869,22 +919,19 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "22:45",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "23:10",
+            "time": "23:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
+          "10:40",
+          "14:20",
           "15:10",
           "16:20",
           "19:40",
           "20:50",
           "22:10",
-          "22:45",
-          "23:10"
+          "23:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
       },
@@ -896,17 +943,32 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "20:40",
+            "time": "14:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "17:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "20:50",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
             "time": "22:45",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "23:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
-          "20:40",
-          "22:45"
+          "14:20",
+          "17:30",
+          "20:50",
+          "22:45",
+          "23:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       },
@@ -920,15 +982,10 @@
           {
             "time": "15:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
-          },
-          {
-            "time": "22:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
-          "15:40",
-          "22:30"
+          "15:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
@@ -1053,6 +1110,10 @@
           {
             "time": "22:15",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
@@ -1061,7 +1122,8 @@
           "18:00",
           "19:55",
           "20:20",
-          "22:15"
+          "22:15",
+          "22:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
       },
@@ -1096,6 +1158,28 @@
           "20:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5285"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "19:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "19:15",
+          "21:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
@@ -1243,17 +1327,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "21:25",
+            "time": "14:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "23:20",
+            "time": "16:05",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "21:25",
-          "23:20"
+          "14:10",
+          "16:05"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
       },
@@ -1265,6 +1349,14 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "14:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "16:05",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
             "time": "18:45",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
@@ -1274,6 +1366,8 @@
           }
         ],
         "times": [
+          "14:10",
+          "16:05",
           "18:45",
           "20:40"
         ],
@@ -1287,17 +1381,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "17:10",
+            "time": "16:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           },
           {
-            "time": "19:05",
+            "time": "17:55",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
-          "17:10",
-          "19:05"
+          "16:00",
+          "17:55"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
@@ -1383,12 +1477,17 @@
           {
             "time": "20:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
           "15:00",
           "17:00",
-          "20:40"
+          "20:40",
+          "22:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
       },
@@ -1427,17 +1526,22 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "18:00",
+            "time": "15:25",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
           },
           {
-            "time": "22:05",
+            "time": "17:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+          },
+          {
+            "time": "22:35",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
           }
         ],
         "times": [
-          "18:00",
-          "22:05"
+          "15:25",
+          "17:50",
+          "22:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
       },
@@ -1459,12 +1563,17 @@
           {
             "time": "20:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
+          },
+          {
+            "time": "22:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
           }
         ],
         "times": [
           "16:00",
           "18:00",
-          "20:00"
+          "20:00",
+          "22:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5283"
       },
@@ -1525,27 +1634,42 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "17:40",
+            "time": "11:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "20:10",
+            "time": "14:05",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "21:30",
+            "time": "18:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "22:25",
+            "time": "18:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "21:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "22:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "23:50",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "17:40",
-          "20:10",
-          "21:30",
-          "22:25"
+          "11:30",
+          "14:05",
+          "18:00",
+          "18:15",
+          "21:50",
+          "22:50",
+          "23:50"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
       },
@@ -1557,11 +1681,11 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:20",
+            "time": "14:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
-            "time": "20:10",
+            "time": "16:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
@@ -1574,8 +1698,8 @@
           }
         ],
         "times": [
+          "14:40",
           "16:20",
-          "20:10",
           "21:40",
           "22:25"
         ],
@@ -1589,7 +1713,15 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:20",
+            "time": "11:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "13:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "16:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           },
           {
@@ -1606,7 +1738,9 @@
           }
         ],
         "times": [
-          "16:20",
+          "11:00",
+          "13:15",
+          "16:10",
           "19:10",
           "20:00",
           "21:40"
@@ -1661,6 +1795,23 @@
           "22:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5404"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Nuovo Sacher",
+        "zone": "Trastevere",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "19:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
+          }
+        ],
+        "times": [
+          "19:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
       },
       {
         "city": "Roma",
@@ -1798,16 +1949,38 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           },
           {
-            "time": "20:20",
+            "time": "20:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
           "15:00",
           "17:30",
-          "20:20"
+          "20:00",
+          "22:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "15:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "15:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
@@ -1910,6 +2083,14 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "11:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "14:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
             "time": "17:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
@@ -1931,6 +2112,8 @@
           }
         ],
         "times": [
+          "11:10",
+          "14:30",
           "17:10",
           "19:30",
           "21:00",
@@ -1947,6 +2130,10 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "14:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
             "time": "17:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
@@ -1957,12 +2144,18 @@
           {
             "time": "22:35",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "23:55",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
+          "14:50",
           "17:10",
           "21:00",
-          "22:35"
+          "22:35",
+          "23:55"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       },
@@ -1974,6 +2167,10 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "10:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
             "time": "16:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           },
@@ -1982,19 +2179,20 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           },
           {
-            "time": "21:30",
+            "time": "21:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           },
           {
-            "time": "23:45",
+            "time": "23:55",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
+          "10:20",
           "16:20",
           "18:40",
-          "21:30",
-          "23:45"
+          "21:20",
+          "23:55"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
@@ -2055,31 +2253,19 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "10:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
             "time": "15:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
+          "10:30",
           "15:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Cinemancini",
-        "zone": "Roma",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "20:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-          }
-        ],
-        "times": [
-          "20:15"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
       },
       {
         "city": "Roma",
@@ -2121,16 +2307,11 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "15:50",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
             "time": "18:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "15:50",
           "18:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
@@ -2143,14 +2324,36 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "15:40",
+            "time": "15:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "18:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
-          "15:40"
+          "15:50",
+          "18:20"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Luxe Maximo",
+        "zone": "Trieste / Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "13:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          }
+        ],
+        "times": [
+          "13:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
     ]
   },
@@ -2308,6 +2511,10 @@
           {
             "time": "22:15",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
@@ -2316,7 +2523,8 @@
           "17:50",
           "19:45",
           "20:20",
-          "22:15"
+          "22:15",
+          "22:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
       },
@@ -2355,17 +2563,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:50",
+            "time": "17:25",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
           },
           {
-            "time": "21:45",
+            "time": "19:20",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
           }
         ],
         "times": [
-          "19:50",
-          "21:45"
+          "17:25",
+          "19:20"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
       },
@@ -2385,14 +2593,6 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
           },
           {
-            "time": "19:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
-          },
-          {
-            "time": "21:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
-          },
-          {
             "time": "21:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
           },
@@ -2404,8 +2604,6 @@
         "times": [
           "17:00",
           "18:55",
-          "19:15",
-          "21:10",
           "21:30",
           "23:25"
         ],
@@ -2446,11 +2644,19 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:50",
+            "time": "10:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "18:45",
+            "time": "12:25",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "14:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "16:45",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
@@ -2471,8 +2677,10 @@
           }
         ],
         "times": [
-          "16:50",
-          "18:45",
+          "10:30",
+          "12:25",
+          "14:50",
+          "16:45",
           "19:00",
           "20:55",
           "21:50",
@@ -2521,6 +2729,58 @@
           "23:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Luxe Maximo",
+        "zone": "Trieste / Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "11:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "13:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "13:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "14:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "15:25",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "16:35",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "21:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "23:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          }
+        ],
+        "times": [
+          "11:15",
+          "13:10",
+          "13:30",
+          "14:40",
+          "15:25",
+          "16:35",
+          "21:50",
+          "23:45"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
     ]
   },
@@ -2650,12 +2910,12 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "21:00",
+            "time": "19:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
           }
         ],
         "times": [
-          "21:00"
+          "19:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
       }
@@ -2682,17 +2942,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:00",
+            "time": "21:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
           },
           {
-            "time": "20:35",
+            "time": "22:35",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
           }
         ],
         "times": [
-          "19:00",
-          "20:35"
+          "21:00",
+          "22:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
       }
@@ -2700,13 +2960,45 @@
   },
   {
     "id": 14,
-    "title": "Il Gatto Col Cappello",
+    "title": "Ugualmente Diversi",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Azzurro Scipioni",
+        "zone": "Prati",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "17:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
+          }
+        ],
+        "times": [
+          "17:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5831"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Il Gatto Col Cappello",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -2775,17 +3067,27 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:30",
+            "time": "13:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "18:15",
+            "time": "15:25",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "16:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "18:35",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "16:30",
-          "18:15"
+          "13:40",
+          "15:25",
+          "16:50",
+          "18:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
       },
@@ -2810,18 +3112,40 @@
           "18:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Luxe Maximo",
+        "zone": "Trieste / Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "13:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "15:25",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          }
+        ],
+        "times": [
+          "13:40",
+          "15:25"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
     ]
   },
   {
-    "id": 15,
+    "id": 16,
     "title": "Il Risveglio Di Boiuna",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -2853,29 +3177,41 @@
           {
             "time": "23:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "23:50",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "23:00",
-          "23:50"
+          "23:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "23:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "23:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
   {
-    "id": 16,
+    "id": 17,
     "title": "Un Weekend Artificiale",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -2952,17 +3288,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:10",
+            "time": "13:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "20:50",
+            "time": "14:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "19:10",
-          "20:50"
+          "13:00",
+          "14:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
       },
@@ -2991,14 +3327,63 @@
     ]
   },
   {
-    "id": 17,
+    "id": 18,
+    "title": "You Can See Everything",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": true,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Adriano",
+        "zone": "Prati",
+        "isOV": true,
+        "language": "V.O. · Sub ITA",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Porta Di Roma",
+        "zone": "Bufalotta",
+        "isOV": true,
+        "language": "V.O. · Sub ITA",
+        "showtimes": [
+          {
+            "time": "20:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          }
+        ],
+        "times": [
+          "20:20"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      }
+    ]
+  },
+  {
+    "id": 19,
     "title": "Fjord",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3023,14 +3408,14 @@
     ]
   },
   {
-    "id": 18,
+    "id": 20,
     "title": "Hexe: Il Regno Delle Streghe",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3057,15 +3442,52 @@
           {
             "time": "20:15",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
           "15:00",
           "15:50",
           "17:30",
-          "20:15"
+          "20:15",
+          "22:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "15:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "17:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "19:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "15:00",
+          "17:00",
+          "19:00",
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
@@ -3085,17 +3507,12 @@
           {
             "time": "19:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
-          },
-          {
-            "time": "21:35",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
           }
         ],
         "times": [
           "15:25",
           "17:30",
-          "19:30",
-          "21:35"
+          "19:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
       },
@@ -3187,11 +3604,11 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
-            "time": "17:30",
+            "time": "17:50",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
-            "time": "17:50",
+            "time": "18:35",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
@@ -3199,16 +3616,16 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
-            "time": "21:30",
+            "time": "21:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
           "15:00",
-          "17:30",
           "17:50",
+          "18:35",
           "20:00",
-          "21:30"
+          "21:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       },
@@ -3226,30 +3643,25 @@
           {
             "time": "19:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
-          },
-          {
-            "time": "21:20",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
           "17:20",
-          "19:00",
-          "21:20"
+          "19:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
     ]
   },
   {
-    "id": 19,
+    "id": 21,
     "title": "L'Estranea",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3311,14 +3723,14 @@
     ]
   },
   {
-    "id": 20,
+    "id": 22,
     "title": "Lorenzo - L'Incredibile Avventura",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3335,42 +3747,15 @@
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           },
           {
-            "time": "19:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
-          },
-          {
-            "time": "21:30",
+            "time": "19:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
           "15:00",
-          "19:30",
-          "21:30"
+          "19:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Porta Di Roma",
-        "zone": "Bufalotta",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "18:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "20:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          }
-        ],
-        "times": [
-          "18:00",
-          "20:30"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
       },
       {
         "city": "Roma",
@@ -3380,16 +3765,11 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "17:40",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          },
-          {
             "time": "20:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
-          "17:40",
           "20:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
@@ -3402,26 +3782,26 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "19:50",
+            "time": "18:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
-          "19:50"
+          "18:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
     ]
   },
   {
-    "id": 21,
+    "id": 23,
     "title": "Odissea",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3446,16 +3826,16 @@
     ]
   },
   {
-    "id": 22,
+    "id": 24,
     "title": "Wild Horse Nine",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
-    "hasOV": false,
+    "hasOV": true,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
     "screenings": [
       {
@@ -3480,15 +3860,64 @@
           {
             "time": "22:15",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+          },
+          {
+            "time": "22:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
           }
         ],
         "times": [
           "17:40",
           "19:40",
           "20:15",
-          "22:15"
+          "22:15",
+          "22:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5304"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Fce Cinema Majestic",
+        "zone": "Roma",
+        "isOV": true,
+        "language": "V.O. · Sub ITA",
+        "showtimes": [
+          {
+            "time": "19:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+          },
+          {
+            "time": "21:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+          }
+        ],
+        "times": [
+          "19:40",
+          "21:40"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7395"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "17:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          },
+          {
+            "time": "19:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "17:10",
+          "19:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
       },
       {
         "city": "Roma",
@@ -3579,8 +4008,72 @@
     ]
   },
   {
-    "id": 23,
+    "id": 25,
+    "title": "Hunger Games - L'Alba Sulla Mieti",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
+    "tag": "ROMA",
+    "hasOV": true,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Cinemancini",
+        "zone": "Roma",
+        "isOV": true,
+        "language": "V.O. · Sub ITA",
+        "showtimes": [
+          {
+            "time": "17:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
+          }
+        ],
+        "times": [
+          "17:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
+      }
+    ]
+  },
+  {
+    "id": 26,
     "title": "Il Destino Dell'Ape",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Cinemancini",
+        "zone": "Roma",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "15:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
+          }
+        ],
+        "times": [
+          "15:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "title": "Mustang (2026)",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -3599,49 +4092,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "15:15",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-          }
-        ],
-        "times": [
-          "15:15"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
-      }
-    ]
-  },
-  {
-    "id": 24,
-    "title": "Mustang (2026)",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Cinemancini",
-        "zone": "Roma",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:30",
+            "time": "21:45",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
           },
           {
-            "time": "21:15",
+            "time": "23:30",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
           }
         ],
         "times": [
-          "19:30",
-          "21:15"
+          "21:45",
+          "23:30"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5657"
       },
@@ -3653,17 +4114,17 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "20:45",
+            "time": "16:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
           },
           {
-            "time": "22:30",
+            "time": "17:45",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
           }
         ],
         "times": [
-          "20:45",
-          "22:30"
+          "16:00",
+          "17:45"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5476"
       },
@@ -3697,24 +4158,56 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "18:10",
+            "time": "17:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
           {
-            "time": "19:55",
+            "time": "19:25",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
-          "18:10",
-          "19:55"
+          "17:40",
+          "19:25"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
   {
-    "id": 25,
+    "id": 28,
+    "title": "Il Fuoco Che Ti Porti Dentro",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Madison Al Fellini",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+          }
+        ],
+        "times": [
+          "21:15"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5802"
+      }
+    ]
+  },
+  {
+    "id": 29,
     "title": "Digger",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
@@ -3746,14 +4239,81 @@
     ]
   },
   {
-    "id": 26,
-    "title": "Look Back",
+    "id": 30,
+    "title": "E Andata Cosi",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
     "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
     "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Madison Cinemas",
+        "zone": "San Paolo",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "14:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "16:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "17:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "19:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "19:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "21:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "21:35",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          },
+          {
+            "time": "23:35",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+          }
+        ],
+        "times": [
+          "14:45",
+          "16:45",
+          "17:00",
+          "19:00",
+          "19:15",
+          "21:15",
+          "21:35",
+          "23:35"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5192"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "title": "Look Back",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3778,14 +4338,14 @@
     ]
   },
   {
-    "id": 27,
+    "id": 32,
     "title": "Wildwood - I Segreti Del Bosco P.",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3810,14 +4370,14 @@
     ]
   },
   {
-    "id": 28,
-    "title": "Sheep In The Box",
+    "id": 33,
+    "title": "Coyote Vs Acme",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3829,6 +4389,59 @@
         "isOV": false,
         "language": "Italiano",
         "showtimes": [
+          {
+            "time": "11:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/6131"
+          }
+        ],
+        "times": [
+          "11:15"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/6131"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Parrot Cinema",
+        "zone": "Roma",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7440"
+          }
+        ],
+        "times": [
+          "21:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7440"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "title": "Sheep In The Box",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Palazzo Dello Spettacolo",
+        "zone": "Roma",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "14:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/6131"
+          },
           {
             "time": "17:05",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/6131"
@@ -3843,6 +4456,7 @@
           }
         ],
         "times": [
+          "14:45",
           "17:05",
           "19:25",
           "21:45"
@@ -3852,51 +4466,14 @@
     ]
   },
   {
-    "id": 29,
-    "title": "Mutosonoro Presenta : Berlino - Sinfonia",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Parrot Cinema",
-        "zone": "Roma",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "21:00",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7440"
-          },
-          {
-            "time": "22:05",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/7440"
-          }
-        ],
-        "times": [
-          "21:00",
-          "22:05"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/7440"
-      }
-    ]
-  },
-  {
-    "id": 30,
+    "id": 35,
     "title": "La Ballata Del Re Delle Api",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3946,14 +4523,51 @@
     ]
   },
   {
-    "id": 31,
+    "id": 36,
+    "title": "Ti Presento I Fotter - Lingua Originale",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "The Screen Roma Ottavia",
+        "zone": "Roma",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "19:15",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
+          },
+          {
+            "time": "21:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
+          }
+        ],
+        "times": [
+          "19:15",
+          "21:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5859"
+      }
+    ]
+  },
+  {
+    "id": 37,
     "title": "Focker-In-Law",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
-    "accent": "bg-rose-500/20 text-rose-300",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
     "tag": "ROMA",
     "hasOV": true,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -3966,53 +4580,31 @@
         "language": "V.O. · Sub ITA",
         "showtimes": [
           {
-            "time": "18:50",
+            "time": "11:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           },
           {
-            "time": "20:45",
+            "time": "13:35",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "18:50",
-          "20:45"
+          "11:40",
+          "13:35"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Romaest",
-        "zone": "Lunghezza",
-        "isOV": true,
-        "language": "V.O. · Sub ITA",
-        "showtimes": [
-          {
-            "time": "18:50",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          },
-          {
-            "time": "20:45",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          }
-        ],
-        "times": [
-          "18:50",
-          "20:45"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
   {
-    "id": 32,
+    "id": 38,
     "title": "Hexed",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
-    "accent": "bg-emerald-500/20 text-emerald-300",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
     "hasOV": true,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -4037,89 +4629,8 @@
     ]
   },
   {
-    "id": 33,
+    "id": 39,
     "title": "Sala Xl) Hexe: Il Regno Delle Streghe",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Porta Di Roma",
-        "zone": "Bufalotta",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "16:40",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          }
-        ],
-        "times": [
-          "16:40"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-      }
-    ]
-  },
-  {
-    "id": 34,
-    "title": "Sala Xl) La Notte Delle Fragole",
-    "genre": "In Sala · Oggi",
-    "duration": "Oggi",
-    "rating": "★",
-    "posterUrl": "",
-    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
-    "accent": "bg-sky-500/20 text-sky-300",
-    "tag": "ROMA",
-    "hasOV": false,
-    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
-    "screenings": [
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Porta Di Roma",
-        "zone": "Bufalotta",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          }
-        ],
-        "times": [
-          "19:10"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Romaest",
-        "zone": "Lunghezza",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "19:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          }
-        ],
-        "times": [
-          "19:10"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-      }
-    ]
-  },
-  {
-    "id": 35,
-    "title": "Xl) Hunger Games:L'Alba Sulla Mietitura",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -4138,46 +4649,24 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "21:30",
+            "time": "11:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "14:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "16:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "21:30"
+          "11:20",
+          "14:00",
+          "16:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-      },
-      {
-        "city": "Roma",
-        "cinema": "Uci Cinemas Romaest",
-        "zone": "Lunghezza",
-        "isOV": false,
-        "language": "Italiano",
-        "showtimes": [
-          {
-            "time": "15:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          },
-          {
-            "time": "16:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          },
-          {
-            "time": "19:50",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          },
-          {
-            "time": "21:30",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
-          }
-        ],
-        "times": [
-          "15:30",
-          "16:10",
-          "19:50",
-          "21:30"
-        ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       },
       {
         "city": "Roma",
@@ -4187,30 +4676,20 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:50",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
-          },
-          {
-            "time": "20:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
-          },
-          {
-            "time": "23:30",
+            "time": "10:50",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
-          "16:50",
-          "20:10",
-          "23:30"
+          "10:50"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
       }
     ]
   },
   {
-    "id": 36,
-    "title": "E' Andata Cosi'",
+    "id": 40,
+    "title": "Sala Xl) La Notte Delle Fragole",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -4229,41 +4708,193 @@
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "16:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "18:10",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "20:20",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
-          },
-          {
-            "time": "22:20",
+            "time": "19:10",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
           }
         ],
         "times": [
-          "16:10",
-          "18:10",
-          "20:20",
-          "22:20"
+          "19:10"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "19:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "19:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
   {
-    "id": 37,
-    "title": "Le Nuove Disavventure Di Cliff B. Imax",
+    "id": 41,
+    "title": "Xl) Lorenzo - L'Incredibile Avventura",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
     "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
     "accent": "bg-amber-500/20 text-amber-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Porta Di Roma",
+        "zone": "Bufalotta",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "21:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          }
+        ],
+        "times": [
+          "21:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "17:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "17:00"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "title": "3D - Hexe: Il Regno Delle Streghe",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Porta Di Roma",
+        "zone": "Bufalotta",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "13:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          }
+        ],
+        "times": [
+          "13:20"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "title": "Gli Anni Del Padre",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#3d1a24] via-[#1f1216] to-[#0a0a0c]",
+    "accent": "bg-rose-500/20 text-rose-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Porta Di Roma",
+        "zone": "Bufalotta",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "11:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "12:40",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "13:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          },
+          {
+            "time": "15:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+          }
+        ],
+        "times": [
+          "11:00",
+          "12:40",
+          "13:30",
+          "15:10"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "14:05",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "15:45",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "14:05",
+          "15:45"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "title": "Le Nuove Disavventure Di Cliff B. Imax",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#17332b] via-[#101c19] to-[#0a0a0c]",
+    "accent": "bg-emerald-500/20 text-emerald-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
@@ -4313,8 +4944,82 @@
     ]
   },
   {
-    "id": 38,
-    "title": "Mammina",
+    "id": 45,
+    "title": "Xl) Hunger Games:L'Alba Sulla Mietitura",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "15:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "19:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
+            "time": "21:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "15:30",
+          "19:50",
+          "21:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      },
+      {
+        "city": "Roma",
+        "cinema": "Uci Luxe Maximo",
+        "zone": "Trieste / Salario",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "13:25",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "16:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "20:10",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
+            "time": "23:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          }
+        ],
+        "times": [
+          "13:25",
+          "16:50",
+          "20:10",
+          "23:30"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "title": "Xl) Scrooge E Gli Spiriti Del Natale",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -4327,25 +5032,25 @@
     "screenings": [
       {
         "city": "Roma",
-        "cinema": "Uci Cinemas Porta Di Roma",
-        "zone": "Bufalotta",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
         "isOV": false,
         "language": "Italiano",
         "showtimes": [
           {
-            "time": "23:55",
-            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+            "time": "23:20",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           }
         ],
         "times": [
-          "23:55"
+          "23:20"
         ],
-        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5119"
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
       }
     ]
   },
   {
-    "id": 39,
+    "id": 47,
     "title": "Hexe: Il Regno Delle Streghe Sala Isens",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
@@ -4365,6 +5070,10 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "14:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          },
+          {
             "time": "16:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
           },
@@ -4378,6 +5087,7 @@
           }
         ],
         "times": [
+          "14:00",
           "16:40",
           "19:30",
           "22:10"
@@ -4392,11 +5102,16 @@
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "14:00",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
             "time": "16:40",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
+          "14:00",
           "16:40"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
@@ -4404,8 +5119,8 @@
     ]
   },
   {
-    "id": 40,
-    "title": "Hunger Games: L'Alba Sulla Miet. Isens",
+    "id": 48,
+    "title": "Mammina",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
@@ -4418,17 +5133,54 @@
     "screenings": [
       {
         "city": "Roma",
+        "cinema": "Uci Cinemas Romaest",
+        "zone": "Lunghezza",
+        "isOV": false,
+        "language": "Italiano",
+        "showtimes": [
+          {
+            "time": "23:50",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+          }
+        ],
+        "times": [
+          "23:50"
+        ],
+        "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5102"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "title": "Hunger Games: L'Alba Sulla Miet. Isens",
+    "genre": "In Sala · Oggi",
+    "duration": "Oggi",
+    "rating": "★",
+    "posterUrl": "",
+    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
+    "accent": "bg-amber-500/20 text-amber-300",
+    "tag": "ROMA",
+    "hasOV": false,
+    "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
+    "screenings": [
+      {
+        "city": "Roma",
         "cinema": "Uci Luxe Maximo",
         "zone": "Trieste / Salario",
         "isOV": false,
         "language": "Italiano",
         "showtimes": [
           {
+            "time": "10:30",
+            "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
+          },
+          {
             "time": "22:00",
             "url": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
           }
         ],
         "times": [
+          "10:30",
           "22:00"
         ],
         "bookingUrl": "https://www.webtic.it/app/shopping/loadLocal/RM/5547"
@@ -4436,14 +5188,14 @@
     ]
   },
   {
-    "id": 41,
+    "id": 50,
     "title": "Ti Presento I Fotter Sala Isens",
     "genre": "In Sala · Oggi",
     "duration": "Oggi",
     "rating": "★",
     "posterUrl": "",
-    "gradient": "from-[#3a2818] via-[#1c1613] to-[#0a0a0c]",
-    "accent": "bg-amber-500/20 text-amber-300",
+    "gradient": "from-[#162942] via-[#101824] to-[#0a0a0c]",
+    "accent": "bg-sky-500/20 text-sky-300",
     "tag": "ROMA",
     "hasOV": false,
     "synopsis": "Biglietteria ufficiale. Tocca un orario per prenotare.",
